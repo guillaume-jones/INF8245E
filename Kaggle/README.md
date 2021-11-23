@@ -1,4 +1,5 @@
 ### Instructions du prof
+
 Class labels : 
 0: big_cats, 
 1: butterfly, 
@@ -13,3 +14,9 @@ Class labels :
 10: squirrel
 
 Use F1-Micro score 
+
+### References
+
+[Keras Tutorials] (https://www.tensorflow.org/tutorials/keras/classification)
+[Keras API] (https://keras.io/api/)
+[Keras Tuner API] (https://keras.io/api/keras_tuner/)

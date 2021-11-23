@@ -1,3 +1,14 @@
+__pycache__
+**/__pycache__
+*.py[cod]
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Cannot include .pkl of datasets since they are too large
 *.pkl
 
-Assignment 3 ScatterNet Test.ipynb
+# Checkpoints add lots of unnecessary files since we retrain
+# with best hyperparameters anyways
+**/checkpoints
+
+
