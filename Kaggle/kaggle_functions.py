@@ -2,6 +2,8 @@ import pickle
 import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.metrics import f1_score
+import tensorflow as tf
+import keras_tuner as kt
 
 def open_pickled_file(filename):
     with open(filename, 'rb') as x_train_pickle:
@@ -29,3 +31,10 @@ def print_f1_micro(y_pred, y_true, title):
 
 def flatten(x):
     return np.reshape(x, (x.shape[0], -1))
+
+def is_tf_using_gpus():
+    gpus = len(tf.config.list_physical_devices('GPU'))
+    if gpus > 0:
+        print(f'TensorFlow is using a GPU. Number of GPUs available: {gpus}')
+    else:
+        print(f'TensorFlow is not using any GPUs.')
