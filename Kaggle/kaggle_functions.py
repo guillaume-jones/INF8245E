@@ -53,30 +53,29 @@ def load_train_set():
 
     return x_train, y_train, x_train_partial, y_train_partial, x_test_fake, y_test_fake
     
-def load_train_as_dataset(batch_size=None):
+def load_train_as_dataset(return_complete_set=False):
     """
     Convert numpy or other dataset to TensorFlow Dataset
     Batch using batch_size
     """
     x_train, y_train, x_train_partial, y_train_partial, x_test_fake, y_test_fake = load_train_set()
 
-    complete_train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+    
     partial_train_dataset = tf.data.Dataset.from_tensor_slices((x_train_partial, y_train_partial))
     fake_test_dataset = tf.data.Dataset.from_tensor_slices((x_test_fake, y_test_fake))
 
-    if batch_size is not None:
-        return (complete_train_dataset.batch(batch_size),
-            partial_train_dataset.batch(batch_size),
-            fake_test_dataset.batch(batch_size))
+    if return_complete_set:
+        complete_train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+        return complete_train_dataset, partial_train_dataset, fake_test_dataset
     
-    return complete_train_dataset, partial_train_dataset, fake_test_dataset
+    return partial_train_dataset, fake_test_dataset
 
 def print_f1_micro(y_pred, y_true, title):
     """
     Wrapper function to print f1-micro score quickly
     """
     f1 = f1_score(list(y_pred), list(y_true), average='micro')
-    print(title + f', F1-micro: {f1:.3f}')
+    print(title + f', F1-micro: {f1:.4f}')
 
 def plot_model_history(history, labels_to_plot=[]):
     label_count = len(labels_to_plot)
@@ -86,12 +85,15 @@ def plot_model_history(history, labels_to_plot=[]):
             axis.plot(history.history[label], label=label)
             axis.set_xlabel('Epoch')
             axis.set_ylabel(label)
+            if 'accuracy' in label:
+                axis.set_ylim([0, 1])
             axis.grid(True)
 
 def plot_confusion_matrix(y_true, y_pred):
     figure, axis = plt.subplots(figsize=(10,10))
     confusion_matrix_display = ConfusionMatrixDisplay(
         confusion_matrix(y_true, y_pred),
+        normalize='true',
         display_labels=get_label_dictionary().keys()
     )
     confusion_matrix_display.plot(
