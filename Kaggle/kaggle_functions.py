@@ -1,6 +1,7 @@
 import pickle
 import numpy as np
 from sklearn.metrics import f1_score
+from sklearn.model_selection import train_test_split
 import tensorflow as tf
 
 def open_pickled_file(filename):
@@ -10,39 +11,53 @@ def open_pickled_file(filename):
     with open(filename, 'rb') as file:
         return np.array(pickle.load(file))
 
-def load_numpy_dataset():
+def load_test_set():
     """
     Open Kaggle competition image dataset
     Scale images to floats and replace labels with class numbers
     """
+    return open_pickled_file('data/x_test.pkl') / 255.0
+
+
+def load_train_set():
+    """
+    Open Kaggle competition image dataset
+    Scale images to floats and replace labels with class numbers
+    Split out a testing set with labels
+    """
     # Open x_train and x_test
     x_train = open_pickled_file('data/x_train.pkl') / 255.0
-    x_test = open_pickled_file('data/x_test.pkl') / 255.0
 
     # Open y_train and convert to numbers
     y_dictionary = {'big_cats':0, 'butterfly':1, 'cat':2, 'chicken':3, 'cow':4, 'dog':5, 
         'elephant':6, 'goat':7, 'horse':8, 'spider':9, 'squirrel':10}
-    y_train_names = open_pickled_file('data/y_train.pkl')
-    y_train = np.zeros(y_train_names.shape, dtype=int)
-    for index, name in enumerate(y_train_names):
+    y_train_raw = open_pickled_file('data/y_train.pkl')
+    y_train = np.zeros(y_train_raw.shape, dtype=int)
+    for index, name in enumerate(y_train_raw):
         y_train[index] = y_dictionary[name]
 
-    return x_train, y_train, x_test
+    x_train_partial, x_test_fake, y_train_partial, y_test_fake = train_test_split(
+        x_train, y_train, test_size=0.2, random_state=1)
+
+    return x_train, y_train, x_train_partial, y_train_partial, x_test_fake, y_test_fake
     
-def load_dataset(batch_size=None):
+def load_as_dataset(batch_size=None):
     """
     Convert numpy or other dataset to TensorFlow Dataset
     Batch using batch_size
     """
-    x_train, y_train, x_test = load_numpy_dataset()
+    x_train, y_train, x_train_partial, y_train_partial, x_test_fake, y_test_fake = load_train_set()
 
-    train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-    test_dataset = tf.data.Dataset.from_tensor_slices((x_test, ))
+    complete_train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+    partial_train_dataset = tf.data.Dataset.from_tensor_slices((x_train_partial, y_train_partial))
+    fake_test_dataset = tf.data.Dataset.from_tensor_slices((x_test_fake, y_test_fake))
 
     if batch_size is not None:
-        return train_dataset.batch(batch_size), test_dataset.batch(batch_size)
+        return (complete_train_dataset.batch(batch_size),
+            partial_train_dataset.batch(batch_size),
+            fake_test_dataset.batch(batch_size))
     
-    return train_dataset, test_dataset
+    return complete_train_dataset, partial_train_dataset, fake_test_dataset
 
 def print_f1_micro(y_pred, y_true, title):
     """
