@@ -1,8 +1,13 @@
 import pickle
 import numpy as np
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, confusion_matrix, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
+import matplotlib.pyplot as plt
+
+def get_label_dictionary():
+    return {'big_cats':0, 'butterfly':1, 'cat':2, 'chicken':3, 'cow':4, 'dog':5, 
+        'elephant':6, 'goat':7, 'horse':8, 'spider':9, 'squirrel':10}
 
 def open_pickled_file(filename):
     """
@@ -17,7 +22,6 @@ def load_test_set():
     Scale images to floats and replace labels with class numbers
     """
     return open_pickled_file('data/x_test.pkl') / 255.0
-
 
 def load_train_set():
     """
@@ -36,8 +40,7 @@ def load_train_set():
 
 
     # Convert word labels to numbers
-    y_dictionary = {'big_cats':0, 'butterfly':1, 'cat':2, 'chicken':3, 'cow':4, 'dog':5, 
-        'elephant':6, 'goat':7, 'horse':8, 'spider':9, 'squirrel':10}
+    y_dictionary = get_label_dictionary()
     y_train = np.zeros(y_train_raw.shape, dtype=int)
     for index, name in enumerate(y_train_raw):
         y_train[index] = y_dictionary[name]
@@ -74,6 +77,26 @@ def print_f1_micro(y_pred, y_true, title):
     """
     f1 = f1_score(list(y_pred), list(y_true), average='micro')
     print(title + f', F1-micro: {f1:.3f}')
+
+def plot_model_history(history, labels_to_plot=[]):
+    label_count = len(labels_to_plot)
+    if label_count > 0:
+        fig, axes = plt.subplots(1, label_count, figsize=(4*label_count, 4))
+        for axis, label in zip(axes, labels_to_plot):
+            axis.plot(history.history[label], label=label)
+            axis.set_xlabel('Epoch')
+            axis.set_ylabel(label)
+            axis.grid(True)
+
+def plot_confusion_matrix(y_true, y_pred):
+    figure, axis = plt.subplots(figsize=(10,10))
+    confusion_matrix_display = ConfusionMatrixDisplay(
+        confusion_matrix(y_true, y_pred),
+        display_labels=get_label_dictionary().keys()
+    )
+    confusion_matrix_display.plot(
+        ax=axis, cmap=plt.cm.BuPu, colorbar=False)
+    plt.show()
 
 def flatten(x):
     """
