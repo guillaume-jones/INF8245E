@@ -17,12 +17,15 @@ Use F1-Micro score.
 
 ### TensorFlow
 
-Tensorflow Keras:
+Tutorials:
 - [Keras quickstart](https://www.tensorflow.org/tutorials/quickstart/beginner)
 - [Keras classification tutorial](https://www.tensorflow.org/tutorials/keras/classification)
 - [Keras Convnets tutorial](https://www.tensorflow.org/tutorials/images/cnn)
 - [Keras Dataset tutorial](https://www.tensorflow.org/guide/data#batching_dataset_elements)
+
+Keras:
 - [Keras reference](https://keras.io/api/)
+- [Keras reference 2](https://www.tensorflow.org/api_docs/python/tf/keras)
 - [Keras Layers reference](https://keras.io/api/layers/)
 - [How to use Keras with a GPU](https://www.tensorflow.org/guide/gpu)
 

@@ -28,20 +28,29 @@ def load_train_set():
     # Open x_train and x_test
     x_train = open_pickled_file('data/x_train.pkl') / 255.0
 
+    # Add extra dimension to images for "channels"
+    x_train = np.reshape(x_train, (-1, 96, 96, 1))
+
     # Open y_train and convert to numbers
+    y_train_raw = open_pickled_file('data/y_train.pkl')
+
+
+    # Convert word labels to numbers
     y_dictionary = {'big_cats':0, 'butterfly':1, 'cat':2, 'chicken':3, 'cow':4, 'dog':5, 
         'elephant':6, 'goat':7, 'horse':8, 'spider':9, 'squirrel':10}
-    y_train_raw = open_pickled_file('data/y_train.pkl')
     y_train = np.zeros(y_train_raw.shape, dtype=int)
     for index, name in enumerate(y_train_raw):
         y_train[index] = y_dictionary[name]
+
+    # Add extra dimension to images for conversion to dataset
+    y_train = np.reshape(y_train, (-1, 1))
 
     x_train_partial, x_test_fake, y_train_partial, y_test_fake = train_test_split(
         x_train, y_train, test_size=0.2, random_state=1)
 
     return x_train, y_train, x_train_partial, y_train_partial, x_test_fake, y_test_fake
     
-def load_as_dataset(batch_size=None):
+def load_train_as_dataset(batch_size=None):
     """
     Convert numpy or other dataset to TensorFlow Dataset
     Batch using batch_size
