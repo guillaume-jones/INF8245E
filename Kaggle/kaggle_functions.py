@@ -70,11 +70,11 @@ def load_train_as_dataset(return_complete_set=False):
     
     return partial_train_dataset, fake_test_dataset
 
-def print_accuracy(y_pred, y_true):
+def print_accuracy(y_true, y_pred):
     """
     Wrapper function to print accuracy quickly
     """
-    accuracy = accuracy_score(list(y_pred), list(y_true))
+    accuracy = accuracy_score(list(y_true), list(y_pred))
     print(f'Accuracy: {accuracy:.4f}')
 
 def plot_model_history(history, labels_to_plot=[]):
@@ -102,8 +102,9 @@ def plot_confusion_matrix(y_true, y_pred):
 
 def save_test_pred(filename, array):
     # Outputs a np array in .csv format
+    array_with_ids = np.c_[np.arange(0, len(array)), array]
     np.savetxt(
-        filename, array, header='Label',
+        filename, array_with_ids, header='Id,class', comments='',
         delimiter = ',', fmt='%d', newline='\n')
 
 def flatten(x):
