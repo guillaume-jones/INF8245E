@@ -35,6 +35,18 @@ Keras Tuner:
 - [Keras Tuner tutorial 2](https://neptune.ai/blog/keras-tuner-tuning-hyperparameters-deep-learning-model)
 
 ### Notes
-
+General
 - Since we are doing multi-class classification, we should always use sparse cross-entropy loss for our models.
 - To predict correctly, should use either from_logits=True in loss function or activation='softmax' in last layer
+- Overfitting evidence : training accuracy gets ahead of valid accuracy
+- Underfitting evidence : training accuracy is always equal to valid accuracy, and remains low
+
+Architecture
+- Dropout layers are typically used with rate=0.5 after Dense layers and rate=0.1 after convolutional layers
+- RandomRotation does not seem to work very well, maybe because it creates 0-pixels
+- [Review of CNN architectures for image classification](https://machinelearningmastery.com/review-of-architectural-innovations-for-convolutional-neural-networks-for-image-classification/)
+
+GoogLeNet
+- [Main Paper](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)
+- Architecture: [table of parameters](https://media.geeksforgeeks.org/wp-content/uploads/20200429201421/Inception-layer-by-layer.PNG), [diagram] (https://miro.medium.com/max/5176/1*ZFPOSAted10TPd3hBQU8iQ.png)
+- [Implementation with Keras](https://machinelearningmastery.com/how-to-implement-major-architecture-innovations-for-convolutional-neural-networks/)
