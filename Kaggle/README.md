@@ -35,6 +35,7 @@ Keras Tuner:
 - [Keras Tuner tutorial 2](https://neptune.ai/blog/keras-tuner-tuning-hyperparameters-deep-learning-model)
 
 ### Notes
+
 General
 - Since we are doing multi-class classification, we should always use sparse cross-entropy loss for our models.
 - To predict correctly, should use either from_logits=True in loss function or activation='softmax' in last layer
@@ -49,4 +50,8 @@ Architecture
 GoogLeNet
 - [Main Paper](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)
 - Architecture: [table of parameters](https://media.geeksforgeeks.org/wp-content/uploads/20200429201421/Inception-layer-by-layer.PNG), [diagram] (https://miro.medium.com/max/5176/1*ZFPOSAted10TPd3hBQU8iQ.png)
+- [Implementation with Keras](https://machinelearningmastery.com/how-to-implement-major-architecture-innovations-for-convolutional-neural-networks/)
+
+ResNet
+- [Main Paper, including architecture](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf)
 - [Implementation with Keras](https://machinelearningmastery.com/how-to-implement-major-architecture-innovations-for-convolutional-neural-networks/)
