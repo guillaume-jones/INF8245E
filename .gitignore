@@ -11,4 +11,7 @@ pip-delete-this-directory.txt
 # with best hyperparameters anyways
 **/checkpoints
 
+# Do not add fashion_mnist example to git
+**/fashion_tutorial
+
 
