@@ -100,6 +100,12 @@ def plot_confusion_matrix(y_true, y_pred):
     confusion_matrix_display.figure_.set_size_inches(10, 10)
     plt.show()
 
+def save_test_pred(filename, array):
+    # Outputs a np array in .csv format
+    np.savetxt(
+        filename, array, header='Label',
+        delimiter = ',', fmt='%d', newline='\n')
+
 def flatten(x):
     """
     Wrapper function to flatten image array
