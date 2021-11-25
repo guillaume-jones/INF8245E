@@ -1,6 +1,6 @@
 import pickle
 import numpy as np
-from sklearn.metrics import f1_score, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -70,12 +70,12 @@ def load_train_as_dataset(return_complete_set=False):
     
     return partial_train_dataset, fake_test_dataset
 
-def print_f1_micro(y_pred, y_true, title):
+def print_accuracy(y_pred, y_true):
     """
-    Wrapper function to print f1-micro score quickly
+    Wrapper function to print accuracy quickly
     """
-    f1 = f1_score(list(y_pred), list(y_true), average='micro')
-    print(title + f', F1-micro: {f1:.4f}')
+    accuracy = accuracy_score(list(y_pred), list(y_true))
+    print(f'Accuracy: {accuracy:.4f}')
 
 def plot_model_history(history, labels_to_plot=[]):
     label_count = len(labels_to_plot)
