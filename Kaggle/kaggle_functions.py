@@ -90,14 +90,14 @@ def plot_model_history(history, labels_to_plot=[]):
             axis.grid(True)
 
 def plot_confusion_matrix(y_true, y_pred):
-    figure, axis = plt.subplots(figsize=(10,10))
-    confusion_matrix_display = ConfusionMatrixDisplay(
-        confusion_matrix(y_true, y_pred),
+    confusion_matrix_display = ConfusionMatrixDisplay.from_predictions(
+        y_true, y_pred,
         normalize='true',
+        cmap=plt.cm.BuPu,
+        colorbar=False,
         display_labels=get_label_dictionary().keys()
     )
-    confusion_matrix_display.plot(
-        ax=axis, cmap=plt.cm.BuPu, colorbar=False)
+    confusion_matrix_display.figure_.set_size_inches(10, 10)
     plt.show()
 
 def flatten(x):
