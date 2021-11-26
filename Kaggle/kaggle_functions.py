@@ -27,7 +27,7 @@ def load_test_set():
     """
     return open_pickled_file('data/x_test.pkl') / 255.0
 
-def load_train_set():
+def load_train_set(resnet=False):
     """
     Open Kaggle competition image dataset
     Scale images to floats and replace labels with class numbers
@@ -37,7 +37,12 @@ def load_train_set():
     x_train = open_pickled_file('data/x_train.pkl') / 255.0
 
     # Add extra dimension to images for "channels"
-    x_train = np.reshape(x_train, (-1, 96, 96, 1))
+    if resnet:
+        x_train = np.stack([x_train, x_train, x_train], axis=3)
+        x_train = tf.keras.applications.resnet_v2.preprocess_input(x_train)
+    else:
+        x_train = np.reshape(x_train, (-1, 96, 96, 1))
+    
 
     # Open y_train and convert to numbers
     y_train_raw = open_pickled_file('data/y_train.pkl')
@@ -57,13 +62,12 @@ def load_train_set():
 
     return x_train, y_train, x_train_partial, y_train_partial, x_test_fake, y_test_fake
     
-def load_train_as_dataset(return_complete_set=False):
+def load_train_as_dataset(return_complete_set=False, resnet=False):
     """
     Convert numpy or other dataset to TensorFlow Dataset
     Batch using batch_size
     """
-    x_train, y_train, x_train_partial, y_train_partial, x_test_fake, y_test_fake = load_train_set()
-
+    x_train, y_train, x_train_partial, y_train_partial, x_test_fake, y_test_fake = load_train_set(resnet)
     
     partial_train_dataset = tf.data.Dataset.from_tensor_slices((x_train_partial, y_train_partial))
     fake_test_dataset = tf.data.Dataset.from_tensor_slices((x_test_fake, y_test_fake))
@@ -81,18 +85,20 @@ def augment_dataset(dataset, batch_size):
     """
     dataset = dataset.shuffle(len(dataset))
 
-    dataset = dataset.batch(batch_size)
-
     dataset = dataset.repeat()
 
     augmentation = tf.keras.Sequential()
     augmentation.add(layers.RandomFlip())
-    # Adding rotation and translation simultaneously creates horrible images
-    if tf.random.uniform([1]) > 0.5:
-        augmentation.add(layers.RandomRotation(0.25))
+    # Adding too much rotation and translation simultaneously creates horrible images
+    translation_selection = tf.random.uniform([1])
+    if translation_selection < 0.3:
+        augmentation.add(layers.RandomRotation(0.5))
+    elif translation_selection < 0.6:
+        augmentation.add(layers.RandomTranslation((-0.4, 0.4), (-0.4, 0.4)))
     else:
-        augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
-    augmentation.add(layers.RandomContrast(0.4))
+        augmentation.add(layers.RandomRotation(0.2))
+        augmentation.add(layers.RandomTranslation((-0.2, 0.2), (-0.2, 0.2)))
+    augmentation.add(layers.RandomContrast(0.5))
 
     dataset = dataset.map(
         lambda image, y: (augmentation(image, training=True), y),
@@ -100,13 +106,14 @@ def augment_dataset(dataset, batch_size):
 
     return dataset.prefetch(buffer_size=AUTOTUNE)
 
-def show_images(dataset):
+def show_images(dataset, count):
     plt.figure(figsize=(10, 10))
-    for image, label in dataset.take(1):
-        for i in range(9):
+    for image, label in dataset.take(count):
+        for i in range(count):
             ax = plt.subplot(3, 3, i + 1)
-            plt.imshow(image[i].numpy(), cmap=plt.cm.gray)
-            plt.title(label[i].numpy()[0])
+            print(image.numpy().shape)
+            plt.imshow(image.numpy(), cmap=plt.cm.gray)
+            # plt.title(label[i].numpy()[0])
             plt.axis("off")
 
 def print_accuracy(y_true, y_pred):
