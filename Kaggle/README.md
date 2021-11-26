@@ -41,6 +41,7 @@ General
 - To predict correctly, should use either from_logits=True in loss function or activation='softmax' in last layer
 - Overfitting evidence : training accuracy gets ahead of valid accuracy
 - Underfitting evidence : training accuracy is always equal to valid accuracy, and remains low
+- Use BayesianTuner if you have Float values, and RandomChoiceTuner for Choice values
 
 Architecture
 - Dropout layers are typically used with rate=0.5 after Dense layers and rate=0.1 after convolutional layers
