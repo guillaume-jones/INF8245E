@@ -69,7 +69,7 @@ def load_train_as_dataset(return_complete_set=False, resnet=False):
     """
     x_train, y_train, x_train_partial, y_train_partial, x_valid, y_valid = load_train_set(resnet)
     
-    train_dataset = tf.data.Dataset.from_tensor_slices((x_train_partial[0:2], y_train_partial[0:2]))
+    train_dataset = tf.data.Dataset.from_tensor_slices((x_train_partial, y_train_partial))
     valid_dataset = tf.data.Dataset.from_tensor_slices((x_valid, y_valid))
 
     if return_complete_set:
