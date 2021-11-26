@@ -3,7 +3,11 @@ import numpy as np
 from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
+import tensorflow.keras.layers as layers
 import matplotlib.pyplot as plt
+
+from tensorflow.python.data.ops.dataset_ops import AUTOTUNE
+from tensorflow.python.ops.gen_logging_ops import image_summary
 
 def get_label_dictionary():
     return {'big_cats':0, 'butterfly':1, 'cat':2, 'chicken':3, 'cow':4, 'dog':5, 
@@ -70,6 +74,41 @@ def load_train_as_dataset(return_complete_set=False):
     
     return partial_train_dataset, fake_test_dataset, y_test_fake
 
+def augment_dataset(dataset, batch_size):
+    """
+    Augment images from training set with standard augmentations
+    Also repeat and shuffle data for good training
+    """
+    dataset = dataset.shuffle(len(dataset))
+
+    dataset = dataset.batch(batch_size)
+
+    dataset = dataset.repeat()
+
+    augmentation = tf.keras.Sequential()
+    augmentation.add(layers.RandomFlip())
+    # Adding rotation and translation simultaneously creates horrible images
+    if tf.random.uniform([1]) > 0.5:
+        augmentation.add(layers.RandomRotation(0.25))
+    else:
+        augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
+    augmentation.add(layers.RandomContrast(0.4))
+
+    dataset = dataset.map(
+        lambda image, y: (augmentation(image, training=True), y),
+        num_parallel_calls=tf.data.AUTOTUNE)
+
+    return dataset.prefetch(buffer_size=AUTOTUNE)
+
+def show_images(dataset):
+    plt.figure(figsize=(10, 10))
+    for image, label in dataset.take(1):
+        for i in range(9):
+            ax = plt.subplot(3, 3, i + 1)
+            plt.imshow(image[i].numpy(), cmap=plt.cm.gray)
+            plt.title(label[i].numpy()[0])
+            plt.axis("off")
+
 def print_accuracy(y_true, y_pred):
     """
     Wrapper function to print accuracy quickly
@@ -78,6 +117,9 @@ def print_accuracy(y_true, y_pred):
     print(f'Accuracy: {accuracy:.4f}')
 
 def plot_model_history(history, labels_to_plot=[]):
+    """
+    Plots the history of specified labels during model training
+    """
     label_count = len(labels_to_plot)
     if label_count > 0:
         fig, axes = plt.subplots(1, label_count, figsize=(4*label_count, 4))
@@ -90,6 +132,9 @@ def plot_model_history(history, labels_to_plot=[]):
             axis.grid(True)
 
 def plot_confusion_matrix(y_true, y_pred):
+    """
+    Pretty-plots a confusion matrix with corresponding labels
+    """
     confusion_matrix_display = ConfusionMatrixDisplay.from_predictions(
         y_true, y_pred,
         normalize='true',
@@ -101,17 +146,13 @@ def plot_confusion_matrix(y_true, y_pred):
     plt.show()
 
 def save_test_pred(filename, array):
-    # Outputs a np array in .csv format
+    """
+    Saves tests for kaggle submission
+    """
     array_with_ids = np.c_[np.arange(0, len(array)), array]
     np.savetxt(
         filename, array_with_ids, header='Id,class', comments='',
         delimiter = ',', fmt='%d', newline='\n')
-
-def flatten(x):
-    """
-    Wrapper function to flatten image array
-    """
-    return np.reshape(x, (x.shape[0], -1))
 
 def is_tf_using_gpus():
     """

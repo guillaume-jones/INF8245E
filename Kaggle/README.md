@@ -47,6 +47,9 @@ Architecture
 - RandomRotation does not seem to work very well, maybe because it creates 0-pixels
 - [Review of CNN architectures for image classification](https://machinelearningmastery.com/review-of-architectural-innovations-for-convolutional-neural-networks-for-image-classification/)
 
+Learning Rate
+- [Learning rate blog post](https://www.jeremyjordan.me/nn-learning-rate/)
+
 GoogLeNet
 - [Main Paper](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)
 - Architecture: [table of parameters](https://media.geeksforgeeks.org/wp-content/uploads/20200429201421/Inception-layer-by-layer.PNG), [diagram] (https://miro.medium.com/max/5176/1*ZFPOSAted10TPd3hBQU8iQ.png)
