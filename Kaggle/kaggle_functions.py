@@ -66,9 +66,9 @@ def load_train_as_dataset(return_complete_set=False):
 
     if return_complete_set:
         complete_train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-        return complete_train_dataset, partial_train_dataset, fake_test_dataset
+        return complete_train_dataset, partial_train_dataset, fake_test_dataset, y_test_fake
     
-    return partial_train_dataset, fake_test_dataset
+    return partial_train_dataset, fake_test_dataset, y_test_fake
 
 def print_accuracy(y_true, y_pred):
     """
