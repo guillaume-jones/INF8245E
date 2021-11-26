@@ -57,26 +57,26 @@ def load_train_set(resnet=False):
     # Add extra dimension to images for conversion to dataset
     y_train = np.reshape(y_train, (-1, 1))
 
-    x_train_partial, x_test_fake, y_train_partial, y_test_fake = train_test_split(
+    x_train_partial, x_valid, y_train_partial, y_valid = train_test_split(
         x_train, y_train, test_size=0.2, random_state=1)
 
-    return x_train, y_train, x_train_partial, y_train_partial, x_test_fake, y_test_fake
+    return x_train, y_train, x_train_partial, y_train_partial, x_valid, y_valid
     
 def load_train_as_dataset(return_complete_set=False, resnet=False):
     """
     Convert numpy or other dataset to TensorFlow Dataset
     Batch using batch_size
     """
-    x_train, y_train, x_train_partial, y_train_partial, x_test_fake, y_test_fake = load_train_set(resnet)
+    x_train, y_train, x_train_partial, y_train_partial, x_valid, y_valid = load_train_set(resnet)
     
-    partial_train_dataset = tf.data.Dataset.from_tensor_slices((x_train_partial, y_train_partial))
-    fake_test_dataset = tf.data.Dataset.from_tensor_slices((x_test_fake, y_test_fake))
+    train_dataset = tf.data.Dataset.from_tensor_slices((x_train_partial[0:2], y_train_partial[0:2]))
+    valid_dataset = tf.data.Dataset.from_tensor_slices((x_valid, y_valid))
 
     if return_complete_set:
         complete_train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-        return complete_train_dataset, partial_train_dataset, fake_test_dataset, y_test_fake
+        return complete_train_dataset, train_dataset, valid_dataset, y_valid
     
-    return partial_train_dataset, fake_test_dataset, y_test_fake
+    return train_dataset, valid_dataset, y_valid
 
 def augment_dataset(dataset, batch_size):
     """
@@ -96,10 +96,10 @@ def augment_dataset(dataset, batch_size):
     if translation_selection < 0.3:
         augmentation.add(layers.RandomRotation(0.5))
     elif translation_selection < 0.6:
-        augmentation.add(layers.RandomTranslation((-0.4, 0.4), (-0.4, 0.4)))
+        augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
     else:
-        augmentation.add(layers.RandomRotation(0.2))
-        augmentation.add(layers.RandomTranslation((-0.2, 0.2), (-0.2, 0.2)))
+        augmentation.add(layers.RandomRotation(0.15))
+        augmentation.add(layers.RandomTranslation((-0.15, 0.15), (-0.15, 0.15)))
     augmentation.add(layers.RandomContrast(0.5))
 
     dataset = dataset.map(
@@ -110,13 +110,13 @@ def augment_dataset(dataset, batch_size):
 
 def show_images(dataset, count):
     plt.figure(figsize=(10, 10))
-    for image, label in dataset.take(count):
+    for images, labels in dataset.take(20):
         for i in range(count):
             ax = plt.subplot(3, 3, i + 1)
-            print(image.numpy().shape)
-            plt.imshow(image.numpy(), cmap=plt.cm.gray)
-            # plt.title(label[i].numpy()[0])
+            plt.imshow(images[i].numpy(), cmap=plt.cm.gray)
+            plt.title(labels[i].numpy()[0])
             plt.axis("off")
+        plt.show()
 
 def print_accuracy(y_true, y_pred):
     """
