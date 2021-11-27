@@ -88,17 +88,11 @@ def augment_dataset(dataset, batch_size):
     dataset = dataset.repeat()
 
     augmentation = tf.keras.Sequential()
-    augmentation.add(layers.RandomFlip())
-    # Adding too much rotation and translation simultaneously creates horrible images
-    translation_selection = tf.random.uniform([1])
-    if translation_selection < 0.3:
-        augmentation.add(layers.RandomRotation(0.5))
-    elif translation_selection < 0.6:
-        augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
-    else:
-        augmentation.add(layers.RandomRotation(0.15))
-        augmentation.add(layers.RandomTranslation((-0.15, 0.15), (-0.15, 0.15)))
-    augmentation.add(layers.RandomContrast(0.5))
+    augmentation.add(layers.RandomFlip(mode='horizontal'))
+    augmentation.add(layers.RandomRotation(0.15))
+    augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
+    # augmentation.add(layers.RandomZoom(.1, .1))
+    augmentation.add(layers.RandomContrast(0.4))
 
     dataset = dataset.map(
         lambda image, y: (augmentation(image, training=True), y),
