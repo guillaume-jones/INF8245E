@@ -36,18 +36,19 @@ Keras Tuner:
 
 ### Models so far
 
-| Model # | Architecture  | Save # | Specifics                                                                              | Augmented | Best accuracy | Submitted |
-|---------|---------------|--------|----------------------------------------------------------------------------------------|-----------|---------------|-----------|
-| 2       | AlexNet       | -      | Extreme overfitting                                                                    |           | ~0.4          | No        |
-| 3       | GoogLeNet     | 1      |                                                                                        | No        | 0.66          | Yes       |
-| 3       | GoogLeNet     | 2      | Different regularization                                                               | No        | 0.63          | No        |
-| 3       | GoogLeNet     | 3      | Added extra dropout                                                                    | No        | 0.66          | Yes       |
-| 4       | Custom Resnet | -      | Tried different types of regularization                                                | Yes       | ~0.5          | No        |
-| 5       | ResNet        | -      | Created from existing architecture, fast learning, had to modify data for 3 channels   | No        | ~0.5          | No        |
-| 6       | VGG           | 0      | No dropout or regularization, 60 epochs                                                | Yes       | 0.5           | No        |
-| 6       | VGG           | 1      | Added dropout, learn_rate=0.001, 150 epochs                                            | Yes       | 0.65          | No        |
-| 6       | VGG           | 2      | Continue training save 1 with learn_rate=0.0001 until val_loss stopped decreasing      | Yes       | 0.69          | No        |
-| 6       | VGG           | 3      | Continue training save 2 with learn_rate=0.00001. Not much improvement beyond 5 epochs | Yes       | 0.70          | Yes       |
+| Model # | Architecture  | Save # | Specifics                                                                                | Augmented | Best accuracy | Submitted |
+|---------|---------------|--------|------------------------------------------------------------------------------------------|-----------|---------------|-----------|
+| 2       | AlexNet       | -      | Extreme overfitting                                                                      |           | ~0.4          | No        |
+| 3       | GoogLeNet     | 1      |                                                                                          | No        | 0.66          | Yes       |
+| 3       | GoogLeNet     | 2      | Different regularization                                                                 | No        | 0.63          | No        |
+| 3       | GoogLeNet     | 3      | Added extra dropout                                                                      | No        | 0.66          | Yes       |
+| 3       | GoogLeNet     | HT     | Tried different L2d and extra inception layers. Best L2 is 0.0025. Extra layers = worse. | No        | 0.59          | No        |
+| 4       | Custom Resnet | -      | Tried different types of regularization                                                  | Yes       | ~0.5          | No        |
+| 5       | ResNet        | -      | Created from existing architecture, fast learning, had to modify data for 3 channels     | No        | ~0.5          | No        |
+| 6       | VGG           | 0      | No dropout or regularization, 60 epochs                                                  | Yes       | 0.5           | No        |
+| 6       | VGG           | 1      | Added dropout, learn_rate=0.001, 150 epochs                                              | Yes       | 0.65          | No        |
+| 6       | VGG           | 2      | Continue training save 1 with learn_rate=0.0001 until val_loss stopped decreasing        | Yes       | 0.69          | No        |
+| 6       | VGG           | 3      | Continue training save 2 with learn_rate=0.00001. Not much improvement beyond 5 epochs   | Yes       | 0.70          | Yes       |
 
 ### Notes
 
