@@ -36,21 +36,28 @@ Keras Tuner:
 
 ### Models so far
 
-| Model # | Architecture  | Save # | Specifics                                                                                | Augmented | Best accuracy | Submitted |
-|---------|---------------|--------|------------------------------------------------------------------------------------------|-----------|---------------|-----------|
-| 2       | AlexNet       | -      | Extreme overfitting                                                                      |           | ~0.4          | No        |
-| 3       | GoogLeNet     | 1      |                                                                                          | No        | 0.66          | Yes       |
-| 3       | GoogLeNet     | 2      | Different regularization                                                                 | No        | 0.63          | No        |
-| 3       | GoogLeNet     | 3      | Added extra dropout                                                                      | No        | 0.66          | Yes       |
-| 3       | GoogLeNet     | HT     | Tried different L2d and extra inception layers. Best L2 is 0.0025. Extra layers = worse. | No        | 0.59          | No        |
-| 4       | Custom Resnet | -      | Tried different types of regularization                                                  | Yes       | ~0.5          | No        |
-| 5       | ResNet        | -      | Created from existing architecture, fast learning, had to modify data for 3 channels     | No        | ~0.5          | No        |
-| 6       | VGG           | 0      | No dropout or regularization, 60 epochs                                                  | Yes       | 0.5           | No        |
-| 6       | VGG           | 1      | Added dropout=0.3, no regularization, learn_rate=0.001, 150 epochs                       | Yes       | 0.65          | No        |
-| 6       | VGG           | 2      | Continue training save 1 with learn_rate=0.0001 until val_loss stopped decreasing        | Yes       | 0.69          | Yes       |
-| 6       | VGG           | HT     | Hypertuning with different levels of dropout and L2. Reload HT for details               | Yes       | 0.65          | No        |
-| 6       | VGG           | 3      | Continue training HT model #2 (dropout=0.5, reg=0.00001) with learn_rate=0.0001          | Yes       | 0.73          | No        |
-| 6       | VGG           | 4      | Dropout=0.4, l2_reg=0.0001. Trained first with lr=0.001, then lr=0.0001                  | Yes       | 0.68          | No        |
+Notes:
+- Forgot to write specifics before VGG
+- Hypertuners can be reloaded for more info on accuracy and hyperparameters
+
+| # | Architecture  | Save # | Specifics                                                            | LR   | L2   | Dropout | Augmented | Best accuracy | Submitted |
+|---|---------------|--------|----------------------------------------------------------------------|------|------|---------|-----------|---------------|-----------|
+| 2 | AlexNet       |        | Extreme overfitting                                                  |      |      |         | No        | ~0.4          | No        |
+| 3 | GoogLeNet     | 1      |                                                                      |      |      |         | No        | 0.66          | Yes       |
+| 3 | GoogLeNet     | 2      | Added extra dropout                                                  |      |      |         | No        | 0.66          | Yes       |
+| 3 | GoogLeNet     | HT     | Tried different L2 (best: 0.0025) and extra inception layers (worse) |      |      |         | No        | 0.59          | No        |
+| 4 | Custom Resnet |        | Tried different types of regularization, always overfit              |      |      |         | Yes       | ~0.5          | No        |
+| 5 | ResNet        |        | Created from existing architecture, fast learning                    |      |      |         | No        | ~0.5          | No        |
+| 6 | VGG           | 0      | 60 epochs                                                            | 1E-3 | 0    | No      | Yes       | 0.5           | No        |
+| 6 | VGG           | 1      | 150 epochs                                                           | 1E-3 | 0    | 0.3     | Yes       | 0.65          | No        |
+| 6 | VGG           | 2      | Continue training from save 1 with learn_rate=0.0001                 | 1E-4 | 0    | 0.3     | Yes       | 0.69          | Yes       |
+| 6 | VGG           | HT     | Hypertuning with different levels of dropout and L2                  | 1E-3 | -    | -       | Yes       | 0.65          | No        |
+| 6 | VGG           | 3      | Continue training 2nd best HT model                                  | 1E-4 | 1E-5 | 0.5     | Yes       | 0.73          | No        |
+| 6 | VGG           | 4      | 150 epochs                                                           | 1E-3 | 1E-4 | 0.4     | Yes       | 0.68          | No        |
+| 6 | VGG           | 5      | Fine tune save 3 with 5 epochs of normal data                        | 1E-5 | 1E-5 | 0.5     | No        | 0.76          | No        |
+| 6 | VGG           | 6      | Fine tune save 2 with 5 epochs of normal data                        | 1E-4 | 1E-5 | 0.5     | No        | 0.80          | No        |
+| 7 | DeeperVGG     | 1      | 150 epochs                                                           | 1E-3 | 1E-5 | 0.3     | Yes       | 0.67          | No        |
+| 7 | DeeperVGG     | 2      | Fine tune save 0 with 5 epochs of normal data                        | 1E-4 | 1E-5 | 0.3     | No        | 0.77          | Yes       |
 
 ### Notes
 
@@ -60,6 +67,7 @@ General
 - Overfitting evidence : training accuracy gets ahead of valid accuracy
 - Underfitting evidence : training accuracy is always equal to valid accuracy, and remains low
 - Use BayesianTuner if you have Float values, and RandomChoiceTuner for Choice values
+- Can get a huge boost (5-10%) from fine-tuning a model that used augmented data, with 5-10 epochs of regular data
 
 Architecture
 - Dropout layers are typically used with rate=0.5 after Dense layers and rate=0.1 after convolutional layers
