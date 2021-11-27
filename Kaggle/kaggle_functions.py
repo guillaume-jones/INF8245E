@@ -6,8 +6,6 @@ import tensorflow as tf
 import tensorflow.keras.layers as layers
 import matplotlib.pyplot as plt
 
-from tensorflow.python.data.ops.dataset_ops import AUTOTUNE
-from tensorflow.python.ops.gen_logging_ops import image_summary
 
 def get_label_dictionary():
     return {'big_cats':0, 'butterfly':1, 'cat':2, 'chicken':3, 'cow':4, 'dog':5, 
@@ -110,7 +108,7 @@ def augment_dataset(dataset, batch_size):
 
 def show_images(dataset, count):
     plt.figure(figsize=(10, 10))
-    for images, labels in dataset.take(20):
+    for images, labels in dataset.take(1):
         for i in range(count):
             ax = plt.subplot(3, 3, i + 1)
             plt.imshow(images[i].numpy(), cmap=plt.cm.gray)
@@ -133,11 +131,16 @@ def plot_model_history(history, labels_to_plot=[]):
     if label_count > 0:
         fig, axes = plt.subplots(1, label_count, figsize=(4*label_count, 4))
         for axis, label in zip(axes, labels_to_plot):
-            axis.plot(history.history[label], label=label)
-            axis.set_xlabel('Epoch')
-            axis.set_ylabel(label)
+            if(isinstance(label, list)):
+                for sub_label in label:
+                    axis.plot(history.history[sub_label], label=sub_label)
+                axis.legend(loc="upper right")
+            else:
+                axis.plot(history.history[label], label=label)
             if 'accuracy' in label:
                 axis.set_ylim([0, 1])
+            axis.set_xlabel('Epoch')
+            axis.set_ylabel(label)
             axis.grid(True)
 
 def plot_confusion_matrix(y_true, y_pred):
