@@ -160,7 +160,7 @@ def save_test_pred(filename, array):
         filename, array_with_ids, header='Id,class', comments='',
         delimiter = ',', fmt='%d', newline='\n')
 
-def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_length):
+def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_length=None):
     """
     Trains models from scratch
     """
@@ -173,21 +173,33 @@ def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_len
         epochs=epochs, steps_per_epoch=epoch_length, 
         callbacks=callbacks, verbose=1)
 
-    return history, model
+    return model, history
 
-def fine_tune_model(model_filepath, dataset, valid_dataset, epochs, learning_rate, epoch_length=None):
+def fine_tune_model(
+    model_filepath, dataset, valid_dataset, epochs, 
+    learning_rate=None, valid_patience=None, epoch_length=None):
     """
     Fine-tune existing models. Uses epoch_length if using an infinite dataset (like augmented), otherwise set to None
     """
     model = tf.keras.models.load_model(model_filepath)
-    model.compile(
-        optimizer=tf.keras.optimizers.Nadam(learning_rate),
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-        metrics=['accuracy'])
+
+    if learning_rate is not None:
+        model.compile(
+            optimizer=tf.keras.optimizers.Nadam(learning_rate),
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+            metrics=['accuracy'])
+
+    if valid_patience is not None:
+        callbacks = [
+            tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=valid_patience)
+        ]
+    else:
+        callbacks=[]
     
     history = model.fit(
         dataset, validation_data=valid_dataset.batch(128).cache(),
-        epochs=epochs, steps_per_epoch=epoch_length, verbose=1)
+        epochs=epochs, steps_per_epoch=epoch_length, 
+        callbacks=callbacks, verbose=1)
 
     return model, history
 
