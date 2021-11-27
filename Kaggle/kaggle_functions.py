@@ -160,6 +160,38 @@ def save_test_pred(filename, array):
         filename, array_with_ids, header='Id,class', comments='',
         delimiter = ',', fmt='%d', newline='\n')
 
+def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_length):
+    """
+    Trains models from scratch
+    """
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=valid_patience)
+    ]
+
+    history = model.fit(
+        dataset, validation_data=valid_dataset.batch(128).cache(),
+        epochs=epochs, steps_per_epoch=epoch_length, 
+        callbacks=callbacks, verbose=1)
+
+    return history, model
+
+def fine_tune_model(model_filepath, dataset, valid_dataset, epochs, learning_rate, epoch_length=None):
+    """
+    Fine-tune existing models. Uses epoch_length if using an infinite dataset (like augmented), otherwise set to None
+    """
+    model = tf.keras.models.load_model(model_filepath)
+    model.compile(
+        optimizer=tf.keras.optimizers.Nadam(learning_rate),
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        metrics=['accuracy'])
+    
+    history = model.fit(
+        dataset, validation_data=valid_dataset.batch(128).cache(),
+        epochs=epochs, steps_per_epoch=epoch_length, verbose=1)
+
+    return model, history
+
+
 def is_tf_using_gpus():
     """
     Check that TensorFlow is using a GPU
