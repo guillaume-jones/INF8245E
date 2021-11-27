@@ -47,8 +47,7 @@ Keras Tuner:
 | 5       | ResNet        | -      | Created from existing architecture, fast learning, had to modify data for 3 channels     | No        | ~0.5          | No        |
 | 6       | VGG           | 0      | No dropout or regularization, 60 epochs                                                  | Yes       | 0.5           | No        |
 | 6       | VGG           | 1      | Added dropout, learn_rate=0.001, 150 epochs                                              | Yes       | 0.65          | No        |
-| 6       | VGG           | 2      | Continue training save 1 with learn_rate=0.0001 until val_loss stopped decreasing        | Yes       | 0.69          | No        |
-| 6       | VGG           | 3      | Continue training save 2 with learn_rate=0.00001. Not much improvement beyond 5 epochs   | Yes       | 0.70          | Yes       |
+| 6       | VGG           | 2      | Continue training save 1 with learn_rate=0.0001 until val_loss stopped decreasing        | Yes       | 0.69          | Yes       |
 
 ### Notes
 
