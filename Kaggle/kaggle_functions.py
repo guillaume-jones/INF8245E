@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import tensorflow.keras.layers as layers
 import matplotlib.pyplot as plt
+import math
 
 
 def get_label_dictionary():
@@ -81,6 +82,7 @@ def augment_dataset(dataset, batch_size):
     Augment images from training set with standard augmentations
     Also repeat and shuffle data for good training
     """
+    epoch_length = math.ceil(len(dataset) / batch_size)
     dataset = dataset.shuffle(len(dataset))
 
     dataset = dataset.batch(batch_size)
@@ -98,7 +100,7 @@ def augment_dataset(dataset, batch_size):
         lambda image, y: (augmentation(image, training=True), y),
         num_parallel_calls=tf.data.AUTOTUNE)
 
-    return dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
+    return dataset.prefetch(buffer_size=tf.data.AUTOTUNE), epoch_length
 
 def show_images(dataset, count):
     plt.figure(figsize=(10, 10))
