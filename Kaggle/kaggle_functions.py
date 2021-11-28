@@ -189,7 +189,8 @@ def fine_tune_model(
 
     if valid_patience is not None:
         callbacks = [
-            tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=valid_patience)
+            tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=valid_patience),  
+            tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=valid_patience, min_lr=0.00001)
         ]
     else:
         callbacks=[]
