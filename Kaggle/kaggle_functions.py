@@ -169,7 +169,7 @@ def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_len
     callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=valid_patience),
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_loss', factor=0.1, patience=valid_patience, 
+            monitor='val_loss', factor=0.1, patience=valid_patience-1, 
             min_lr=0.00001, verbose=1)
     ]
 

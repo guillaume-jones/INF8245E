@@ -86,7 +86,7 @@ Learning Rate
 
 GoogLeNet
 - [Main Paper](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)
-- Architecture: [table of parameters](https://media.geeksforgeeks.org/wp-content/uploads/20200429201421/Inception-layer-by-layer.PNG), [diagram] (https://miro.medium.com/max/5176/1*ZFPOSAted10TPd3hBQU8iQ.png)
+- Architecture: [table of parameters](https://media.geeksforgeeks.org/wp-content/uploads/20200429201421/Inception-layer-by-layer.PNG), [diagram](https://miro.medium.com/max/5176/1*ZFPOSAted10TPd3hBQU8iQ.png)
 - [Implementation with Keras](https://machinelearningmastery.com/how-to-implement-major-architecture-innovations-for-convolutional-neural-networks/)
 
 ResNet
