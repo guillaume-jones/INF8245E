@@ -46,6 +46,7 @@ Notes:
 | 3 | GoogLeNet     | 1      |                                                                      |      |      |         | No        | 0.66          | Yes       |
 | 3 | GoogLeNet     | 2      | Added extra dropout                                                  |      |      |         | No        | 0.66          | Yes       |
 | 3 | GoogLeNet     | HT     | Tried different L2 (best: 0.0025) and extra inception layers (worse) |      |      |         | No        | 0.59          | No        |
+| 3 | GoogLeNet     | 3      | Augmented data and batch normalization, then fine-tuning. 220 epochs | 1E-4 | 2.5E-3 | 0.75  | Yes       | 0.71          | No        |
 | 4 | Custom Resnet |        | Tried different types of regularization, always overfit              |      |      |         | Yes       | ~0.5          | No        |
 | 5 | ResNet        |        | Created from existing architecture, fast learning                    |      |      |         | No        | ~0.5          | No        |
 | 6 | VGG           | 0      | 60 epochs                                                            | 1E-3 | 0    | No      | Yes       | 0.5           | No        |
@@ -61,7 +62,6 @@ Notes:
 | 7 | DeeperVGG     | 3      | Tried SpatialDropout                                                 | 1E-3 | 1E-4 | 0.3     | Yes       | 0.65          | No        |
 | 7 | DeeperVGG     | 4      | Fine-tuned save 3 with augmented and normal data                     | 1E-4 | 1E-4 | 0.3     | Yes       | 0.79          | No        |
 | 7 | DeeperVGG     | 5      | Tried minor changes and final layer of 64 + fine-tuning              | 1E-4 | 1E-4 | 0.3     | Yes       | 0.78          | No        |
-| 7 | VGG Res       | 1      | Replaced 256 and 512 with residual blocks. Training not finished!    | 5E-4 | 1E-3 | 0.3     | Yes       | 0.55*         | No        |
 | 7 | VGG Res       | HT     | Hypertuning learning rate, dropout and L2, plus added LR drop-off    | 1E-3 | 1E-3 | -       | Yes       | 0.65          | No        |
 
 ### Notes
