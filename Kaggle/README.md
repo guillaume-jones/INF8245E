@@ -56,7 +56,7 @@ Notes:
 | 6 | VGG           | 3      | Continue training 2nd best HT model                                  | 1E-4 | 1E-5 | 0.5     | Yes       | 0.73          | No        |
 | 6 | VGG           | 4      | 150 epochs                                                           | 1E-3 | 1E-4 | 0.4     | Yes       | 0.68          | No        |
 | 6 | VGG           | 5      | Fine tune save 3 with 5 epochs of normal data                        | 1E-5 | 1E-5 | 0.5     | No        | 0.76          | No        |
-| 6 | VGG           | 6      | Fine tune save 2 with 5 epochs of normal data                        | 1E-4 | 1E-5 | 0.5     | No        | 0.80          | No        |
+| 6 | VGG           | 6      | Fine tune save 2 with 5 epochs of normal data                        | 1E-4 | 1E-5 | 0.5     | No        | 0.80          | Yes       |
 | 7 | DeeperVGG     | 1      | 150 epochs                                                           | 1E-3 | 1E-5 | 0.3     | Yes       | 0.67          | No        |
 | 7 | DeeperVGG     | 2      | Fine tune save 0 with 5 epochs of normal data                        | 1E-4 | 1E-5 | 0.3     | No        | 0.77          | Yes       |
 | 7 | DeeperVGG     | 3      | Tried SpatialDropout                                                 | 1E-3 | 1E-4 | 0.3     | Yes       | 0.65          | No        |
