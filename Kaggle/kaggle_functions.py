@@ -176,13 +176,11 @@ def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_len
     return model, history
 
 def fine_tune_model(
-    model_filepath, dataset, valid_dataset, epochs, 
+    model, dataset, valid_dataset, epochs, 
     learning_rate=None, valid_patience=None, epoch_length=None):
     """
     Fine-tune existing models. Uses epoch_length if using an infinite dataset (like augmented), otherwise set to None
     """
-    model = tf.keras.models.load_model(model_filepath)
-
     if learning_rate is not None:
         model.compile(
             optimizer=tf.keras.optimizers.Nadam(learning_rate),
@@ -202,6 +200,21 @@ def fine_tune_model(
         callbacks=callbacks, verbose=1)
 
     return model, history
+
+def fine_tune_model_filepath(
+    model_filepath, dataset, valid_dataset, epochs, 
+    learning_rate=None, valid_patience=None, epoch_length=None):
+    """
+    Load model from file before fine-tuning
+    """
+    model = tf.keras.models.load_model(model_filepath)
+    model, history = fine_tune_model(
+        model, dataset, valid_dataset, epochs, 
+        learning_rate=learning_rate, valid_patience=valid_patience, 
+        epoch_length=epoch_length)
+
+    return model, history
+
 
 
 def is_tf_using_gpus():
