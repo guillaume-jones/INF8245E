@@ -1,6 +1,6 @@
 import pickle
 import numpy as np
-from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay
+from sklearn.metrics import f1_score, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import tensorflow.keras.layers as layers
@@ -91,10 +91,10 @@ def augment_dataset(dataset, batch_size):
 
     augmentation = tf.keras.Sequential()
     augmentation.add(layers.RandomFlip(mode='horizontal'))
-    augmentation.add(layers.RandomRotation(0.15))
-    augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
-    # augmentation.add(layers.RandomZoom(.1, .1))
-    augmentation.add(layers.RandomContrast(0.4))
+    augmentation.add(layers.RandomRotation(0.1))
+    augmentation.add(layers.RandomTranslation((-0.4, 0.4), (-0.4, 0.4)))
+    # augmentation.add(layers.RandomZoom(.05, .05))
+    augmentation.add(layers.RandomContrast(0.5))
 
     dataset = dataset.map(
         lambda image, y: (augmentation(image, training=True), y),
@@ -116,7 +116,7 @@ def print_accuracy(y_true, y_pred):
     """
     Wrapper function to print accuracy quickly
     """
-    accuracy = accuracy_score(list(y_true), list(y_pred))
+    accuracy = f1_score(list(y_true), list(y_pred), average='micro')
     print(f'Accuracy: {accuracy:.4f}')
 
 def plot_model_history(history, labels_to_plot=[]):

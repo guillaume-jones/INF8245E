@@ -62,7 +62,8 @@ Notes:
 | 7 | DeeperVGG     | 3      | Tried SpatialDropout                                                 | 1E-3 | 1E-4 | 0.3     | Yes       | 0.65          | No        |
 | 7 | DeeperVGG     | 4      | Fine-tuned save 3 with augmented and normal data                     | 1E-4 | 1E-4 | 0.3     | Yes       | 0.79          | Yes       |
 | 7 | DeeperVGG     | 5      | Tried minor changes and final layer of 64 + fine-tuning              | 1E-4 | 1E-4 | 0.3     | Yes       | 0.78          | No        |
-| 7 | VGG Res       | HT     | Hypertuning learning rate, dropout and L2, plus added LR drop-off    | 1E-3 | 1E-3 | -       | Yes       | 0.65          | No        |
+| 7 | VGG Res       | HT     | Hypertuning learning rate, dropout and L2                            | 1E-3 | 1E-3 | -       | Yes       | 0.65          | No        |
+| 7 | VGG Res       | 1      | 150 epochs + learning rate decrease + fine-tuning                    | 1E-3 | 1E-3 | 0.5     | Yes       | 0.76          | No        |
 
 ### Notes
 
@@ -73,15 +74,14 @@ General
 - Underfitting evidence : training accuracy is always equal to valid accuracy, and remains low
 - Use BayesianTuner if you have Float values, and RandomChoiceTuner for Choice values
 
-
 Architecture
-- Dropout layers are typically used with rate=0.5 after Dense layers and rate=0.1 after convolutional layers
-- RandomRotation does not seem to work very well, maybe because it creates 0-pixels
 - [Review of CNN architectures for image classification](https://machinelearningmastery.com/review-of-architectural-innovations-for-convolutional-neural-networks-for-image-classification/)
+- Dropout layers are typically used with rate=0.5 after Dense layers and rate=0.1 after convolutional layers
+- RandomZoom seems to break certain models (no learning at all)
 
 Learning Rate
 - [Learning rate blog post](https://www.jeremyjordan.me/nn-learning-rate/)
-- Restarting Adam with a lower rate can boost accuracy up to 5% with 5-10 epochs
+- Lowering the learning rate when valid accuracy stops increasing can give 2-5% more accuracy
 - Fine-tuning with 5-10 epochs of non-augmented data can boost accuracy 5-10%
 
 GoogLeNet
