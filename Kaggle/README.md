@@ -69,6 +69,11 @@ Notes:
 | 7 | VGG Res       | 2      | 150 epochs + learning rate decrease                                  | 5E-4 | 1E-4 | 0.6     | Yes       | 0.70      | No        |
 | 7 | VGG Res       | 3      | Fine-tuning on save 2                                                | 5E-4 | 1E-4 | 0.56    | No        | 0.79      | No        |
 
+Stacking test:
+- Tried averaging best VGG, 2 good DeeperVGGs and VGG Res
+- Altered data to give more weight to models with higher accuracy and confidence
+- Showed 2% improvement on validation set, but only improved score by 1% on Kaggle
+
 ### Notes
 
 General
