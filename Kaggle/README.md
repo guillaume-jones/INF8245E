@@ -64,6 +64,8 @@ Notes:
 | 7 | DeeperVGG     | 5      | Tried minor changes and final layer of 64 + fine-tuning              | 1E-4 | 1E-4 | 0.3     | Yes       | 0.78          | No        |
 | 7 | VGG Res       | HT     | Hypertuning learning rate, dropout and L2                            | 1E-3 | 1E-3 | -       | Yes       | 0.65          | No        |
 | 7 | VGG Res       | 1      | 150 epochs + learning rate decrease + fine-tuning                    | 1E-3 | 1E-3 | 0.5     | Yes       | 0.76          | No        |
+| 7 | VGG Res       | 2      | 150 epochs + learning rate decrease                                  | 5E-4 | 1E-4 | 0.6     | Yes       | 0.70          | No        |
+| 7 | VGG Res       | 3      | Fine-tuning on save 2                                                | 5E-4 | 1E-4 | 0.56    | No        | 0.79          | No        |
 
 ### Notes
 
