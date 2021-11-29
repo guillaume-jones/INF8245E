@@ -40,32 +40,34 @@ Notes:
 - Forgot to write specifics before VGG
 - Hypertuners can be reloaded for more info on accuracy and hyperparameters
 
-| # | Architecture  | Save # | Specifics                                                            | LR   | L2   | Dropout | Augmented | Best accuracy | Submitted |
-|---|---------------|--------|----------------------------------------------------------------------|------|------|---------|-----------|---------------|-----------|
-| 2 | AlexNet       |        | Extreme overfitting                                                  |      |      |         | No        | ~0.4          | No        |
-| 3 | GoogLeNet     | 1      |                                                                      |      |      |         | No        | 0.66          | Yes       |
-| 3 | GoogLeNet     | 2      | Added extra dropout                                                  |      |      |         | No        | 0.66          | Yes       |
-| 3 | GoogLeNet     | HT     | Tried different L2 (best: 0.0025) and extra inception layers (worse) |      |      |         | No        | 0.59          | No        |
-| 3 | GoogLeNet     | 3      | Augmented data and batch normalization, then fine-tuning. 220 epochs | 1E-4 | 2.5E-3 | 0.75  | Yes       | 0.71          | No        |
-| 4 | Custom Resnet |        | Tried different types of regularization, always overfit              |      |      |         | Yes       | ~0.5          | No        |
-| 5 | ResNet        |        | Created from existing architecture, fast learning                    |      |      |         | No        | ~0.5          | No        |
-| 6 | VGG           | 0      | 60 epochs                                                            | 1E-3 | 0    | No      | Yes       | 0.5           | No        |
-| 6 | VGG           | 1      | 150 epochs                                                           | 1E-3 | 0    | 0.3     | Yes       | 0.65          | No        |
-| 6 | VGG           | 2      | Continue training from save 1 with learn_rate=0.0001                 | 1E-4 | 0    | 0.3     | Yes       | 0.69          | Yes       |
-| 6 | VGG           | HT     | Hypertuning with different levels of dropout and L2                  | 1E-3 | -    | -       | Yes       | 0.65          | No        |
-| 6 | VGG           | 3      | Continue training 2nd best HT model                                  | 1E-4 | 1E-5 | 0.5     | Yes       | 0.73          | No        |
-| 6 | VGG           | 4      | 150 epochs                                                           | 1E-3 | 1E-4 | 0.4     | Yes       | 0.68          | No        |
-| 6 | VGG           | 5      | Fine tune save 3 with 5 epochs of normal data                        | 1E-5 | 1E-5 | 0.5     | No        | 0.76          | No        |
-| 6 | VGG           | 6      | Fine tune save 2 with 5 epochs of normal data                        | 1E-4 | 1E-5 | 0.5     | No        | 0.80          | Yes       |
-| 7 | DeeperVGG     | 1      | 150 epochs                                                           | 1E-3 | 1E-5 | 0.3     | Yes       | 0.67          | No        |
-| 7 | DeeperVGG     | 2      | Fine tune save 0 with 5 epochs of normal data                        | 1E-4 | 1E-5 | 0.3     | No        | 0.77          | Yes       |
-| 7 | DeeperVGG     | 3      | Tried SpatialDropout                                                 | 1E-3 | 1E-4 | 0.3     | Yes       | 0.65          | No        |
-| 7 | DeeperVGG     | 4      | Fine-tuned save 3 with augmented and normal data                     | 1E-4 | 1E-4 | 0.3     | Yes       | 0.79          | Yes       |
-| 7 | DeeperVGG     | 5      | Tried minor changes and final layer of 64 + fine-tuning              | 1E-4 | 1E-4 | 0.3     | Yes       | 0.78          | No        |
-| 7 | VGG Res       | HT     | Hypertuning learning rate, dropout and L2                            | 1E-3 | 1E-3 | -       | Yes       | 0.65          | No        |
-| 7 | VGG Res       | 1      | 150 epochs + learning rate decrease + fine-tuning                    | 1E-3 | 1E-3 | 0.5     | Yes       | 0.76          | No        |
-| 7 | VGG Res       | 2      | 150 epochs + learning rate decrease                                  | 5E-4 | 1E-4 | 0.6     | Yes       | 0.70          | No        |
-| 7 | VGG Res       | 3      | Fine-tuning on save 2                                                | 5E-4 | 1E-4 | 0.56    | No        | 0.79          | No        |
+| # | Architecture  | Save # | Specifics                                                            | LR   | L2   | Dropout | Augmented | Best acc. | Submitted |
+|---|---------------|--------|----------------------------------------------------------------------|------|------|---------|-----------|-----------|-----------|
+| 2 | AlexNet       |        | Extreme overfitting                                                  |      |      |         | No        | ~0.4      | No        |
+| 3 | GoogLeNet     | 1      |                                                                      |      |      |         | No        | 0.66      | Yes       |
+| 3 | GoogLeNet     | 2      | Added extra dropout                                                  |      |      |         | No        | 0.66      | Yes       |
+| 3 | GoogLeNet     | HT     | Tried different L2 (best: 0.0025) and extra inception layers (worse) |      |      |         | No        | 0.59      | No        |
+| 3 | GoogLeNet     | 3      | Augmented data and batch normalization, then fine-tuning. 220 epochs | 1E-4 | 2.5E-3 | 0.75  | Yes       | 0.71      | No        |
+| 4 | Custom Resnet |        | Tried different types of regularization, always overfit              |      |      |         | Yes       | ~0.5      | No        |
+| 5 | ResNet        |        | Created from existing architecture, fast learning                    |      |      |         | No        | ~0.5      | No        |
+| 6 | VGG           | 0      | 60 epochs                                                            | 1E-3 | 0    | No      | Yes       | 0.5       | No        |
+| 6 | VGG           | 1      | 150 epochs                                                           | 1E-3 | 0    | 0.3     | Yes       | 0.65      | No        |
+| 6 | VGG           | 2      | Continue training from save 1 with learn_rate=0.0001                 | 1E-4 | 0    | 0.3     | Yes       | 0.69      | Yes       |
+| 6 | VGG           | HT     | Hypertuning with different levels of dropout and L2                  | 1E-3 | -    | -       | Yes       | 0.65      | No        |
+| 6 | VGG           | 3      | Continue training 2nd best HT model                                  | 1E-4 | 1E-5 | 0.5     | Yes       | 0.73      | No        |
+| 6 | VGG           | 4      | 150 epochs                                                           | 1E-3 | 1E-4 | 0.4     | Yes       | 0.68      | No        |
+| 6 | VGG           | 5      | Fine tune save 3 with 5 epochs of normal data                        | 1E-5 | 1E-5 | 0.5     | No        | 0.76      | No        |
+| 6 | VGG           | 6      | Fine tune save 2 with 5 epochs of normal data                        | 1E-4 | 1E-5 | 0.5     | No        | 0.80      | Yes       |
+| 7 | DeeperVGG     | 1      | 150 epochs                                                           | 1E-3 | 1E-5 | 0.3     | Yes       | 0.67      | No        |
+| 7 | DeeperVGG     | 2      | Fine tune save 0 with 5 epochs of normal data                        | 1E-4 | 1E-5 | 0.3     | No        | 0.77      | Yes       |
+| 7 | DeeperVGG     | 3      | Tried SpatialDropout                                                 | 1E-3 | 1E-4 | 0.3     | Yes       | 0.65      | No        |
+| 7 | DeeperVGG     | 4      | Fine-tuned save 3 with augmented and normal data                     | 1E-4 | 1E-4 | 0.3     | Yes       | 0.79      | Yes       |
+| 7 | DeeperVGG     | 5      | Tried minor changes and final layer of 64 + fine-tuning              | 1E-4 | 1E-4 | 0.3     | Yes       | 0.78      | No        |
+| 7 | DeeperVGG     | HT     | Add new 1024-deep layer + more batch norm + extra dropout + conv L2  | 5E-4 | -    | -       | Yes       | 0.78      | No        |
+| 7 | DeeperVGG     | 6      | Fine tune best HT model with non-augmented data                      | 1E-4 | 1E-3 | 0.4     | Yes       | 0.84      | No        |
+| 7 | VGG Res       | HT     | Hypertuning learning rate, dropout and L2                            | 1E-3 | -    | -       | Yes       | 0.65      | No        |
+| 7 | VGG Res       | 1      | 150 epochs + learning rate decrease + fine-tuning                    | 1E-3 | 1E-3 | 0.5     | Yes       | 0.76      | No        |
+| 7 | VGG Res       | 2      | 150 epochs + learning rate decrease                                  | 5E-4 | 1E-4 | 0.6     | Yes       | 0.70      | No        |
+| 7 | VGG Res       | 3      | Fine-tuning on save 2                                                | 5E-4 | 1E-4 | 0.56    | No        | 0.79      | No        |
 
 ### Notes
 
@@ -75,6 +77,7 @@ General
 - Overfitting evidence : training accuracy gets ahead of valid accuracy
 - Underfitting evidence : training accuracy is always equal to valid accuracy, and remains low
 - Use BayesianTuner if you have Float values, and RandomChoiceTuner for Choice values
+- Once we have obtained our best model, we should train it on all the training data
 
 Architecture
 - [Review of CNN architectures for image classification](https://machinelearningmastery.com/review-of-architectural-innovations-for-convolutional-neural-networks-for-image-classification/)
