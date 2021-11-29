@@ -161,7 +161,7 @@ def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_len
     callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_accuracy', factor=0.1, patience=valid_patience-10, 
+            monitor='val_accuracy', factor=0.1, patience=int(valid_patience*0.7), 
             min_lr=0.00001, verbose=1)
     ]
 
@@ -188,7 +188,7 @@ def fine_tune_model(
         callbacks = [
             tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
             tf.keras.callbacks.ReduceLROnPlateau(
-                monitor='val_accuracy', factor=0.1, patience=valid_patience-10, 
+                monitor='val_accuracy', factor=0.1, patience=int(valid_patience*0.7), 
                 min_lr=0.00001, verbose=1)
         ]
     else:
