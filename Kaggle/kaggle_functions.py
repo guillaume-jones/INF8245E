@@ -153,14 +153,6 @@ def plot_confusion_matrix(y_true, y_pred):
     confusion_matrix_display.figure_.set_size_inches(10, 10)
     plt.show()
 
-def save_test_pred(filename, array):
-    """
-    Saves tests for kaggle submission
-    """
-    array_with_ids = np.c_[np.arange(0, len(array)), array]
-    np.savetxt(
-        filename, array_with_ids, header='Id,class', comments='',
-        delimiter = ',', fmt='%d', newline='\n')
 
 def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_length=None):
     """
@@ -223,7 +215,30 @@ def fine_tune_model_filepath(
 
     return model, history
 
+def save_test_pred(filename, array):
+    """
+    Saves tests for kaggle submission
+    """
+    array_with_ids = np.c_[np.arange(0, len(array)), array]
+    np.savetxt(
+        filename, array_with_ids, header='Id,class', comments='',
+        delimiter = ',', fmt='%d', newline='\n')
 
+def generate_test_pred(model, pred_filepath):
+    x_test_real = load_test_set()
+    true_test_pred = np.argmax(model.predict(x_test_real), axis=1)
+
+    save_test_pred(pred_filepath, true_test_pred)
+
+def generate_test_pred_filepath(model_filepath):
+    try:
+        model = tf.keras.models.load_model(model_filepath)
+        print('Model found, generating predictions...')
+    except:
+        print('No model at filepath.')
+        return
+
+    generate_test_pred(model, f'{model_filepath}_test_pred.csv')
 
 def is_tf_using_gpus():
     """

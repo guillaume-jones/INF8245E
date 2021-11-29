@@ -60,7 +60,7 @@ Notes:
 | 7 | DeeperVGG     | 1      | 150 epochs                                                           | 1E-3 | 1E-5 | 0.3     | Yes       | 0.67          | No        |
 | 7 | DeeperVGG     | 2      | Fine tune save 0 with 5 epochs of normal data                        | 1E-4 | 1E-5 | 0.3     | No        | 0.77          | Yes       |
 | 7 | DeeperVGG     | 3      | Tried SpatialDropout                                                 | 1E-3 | 1E-4 | 0.3     | Yes       | 0.65          | No        |
-| 7 | DeeperVGG     | 4      | Fine-tuned save 3 with augmented and normal data                     | 1E-4 | 1E-4 | 0.3     | Yes       | 0.79          | No        |
+| 7 | DeeperVGG     | 4      | Fine-tuned save 3 with augmented and normal data                     | 1E-4 | 1E-4 | 0.3     | Yes       | 0.79          | Yes       |
 | 7 | DeeperVGG     | 5      | Tried minor changes and final layer of 64 + fine-tuning              | 1E-4 | 1E-4 | 0.3     | Yes       | 0.78          | No        |
 | 7 | VGG Res       | HT     | Hypertuning learning rate, dropout and L2, plus added LR drop-off    | 1E-3 | 1E-3 | -       | Yes       | 0.65          | No        |
 
