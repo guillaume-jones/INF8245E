@@ -106,6 +106,13 @@ ResNet
 - [Main Paper, including architecture](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf)
 - [Implementation with Keras](https://machinelearningmastery.com/how-to-implement-major-architecture-innovations-for-convolutional-neural-networks/)
 
+Wide ResNet
+ - [PyTorch implementation, consider trying in Keras](https://brandonmorris.dev/2018/06/30/wide-resnet-pytorch/)
+ 
+Vision Transformer
+- Transformers apparently need a lot of data (consider strong data augmentation)
+- [Keras example](https://keras.io/examples/vision/image_classification_with_vision_transformer/)
+
 Dataset is called Animals-10
 - Very little info/usage
 - Several example on [Kaggle page](https://www.kaggle.com/alessiocorrado99/animals10/code) but they are mostly transfer learning
