@@ -4,6 +4,7 @@ from sklearn.metrics import f1_score, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import tensorflow.keras.layers as layers
+import keras_tuner as kt
 import matplotlib.pyplot as plt
 import math
 
@@ -214,6 +215,62 @@ def fine_tune_model_filepath(
         epoch_length=epoch_length)
 
     return model, history
+
+def load_hypertuner(model, model_number, tuner_filepath, tuner_type='random'):
+    if tuner_type == 'bayesian':
+        tuner = kt.BayesianOptimization(model,
+            objective='val_accuracy',
+            directory=f'models/{model_number}',
+            project_name=tuner_filepath)
+    elif tuner_type == 'random':
+        tuner = kt.RandomSearch(model,
+            objective='val_accuracy',
+            directory=f'models/{model_number}',
+            project_name=tuner_filepath)
+
+    tuner.results_summary()
+    return tuner
+
+def hypertune_model(
+    model, dataset, valid_dataset, model_number, tuner_filepath, epochs, trials,  
+    tuner_type='random', valid_patience=None, epoch_length=None):
+
+    tuner_callbacks = [
+        tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
+        tf.keras.callbacks.ReduceLROnPlateau(
+            monitor='val_accuracy', factor=0.1, patience=int(valid_patience*0.7), 
+            min_lr=5E-6, verbose=1)
+    ]
+    if tuner_type == 'bayesian':
+        tuner = kt.BayesianOptimization(model,
+            objective='val_accuracy',
+            max_trials=trials,
+            seed=1,
+            directory=f'models/{model_number}',
+            project_name=tuner_filepath,
+            overwrite=True)
+    elif tuner_type == 'random':
+        tuner = kt.RandomSearch(model,
+            objective='val_accuracy',
+            max_trials=trials,
+            seed=1,
+            directory=f'models/{model_number}',
+            project_name=tuner_filepath,
+            overwrite=True)
+
+    tuner.search_space_summary()
+
+    tuner.search(
+        dataset, 
+        validation_data=valid_dataset.batch(128).cache(),
+        epochs=epochs, steps_per_epoch=epoch_length,
+        callbacks=tuner_callbacks, verbose=1)
+
+    tuner.results_summary()
+
+    return tuner
+
+    
 
 def save_test_pred(filename, array):
     """
