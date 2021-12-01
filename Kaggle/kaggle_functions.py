@@ -93,8 +93,8 @@ def augment_dataset(dataset, batch_size):
     augmentation.add(layers.RandomFlip(mode='horizontal'))
     augmentation.add(layers.RandomRotation(0.1))
     augmentation.add(layers.RandomTranslation((-0.4, 0.4), (-0.4, 0.4)))
-    # augmentation.add(layers.RandomZoom(.05, .05))
-    augmentation.add(layers.RandomContrast(0.5))
+    # augmentation.add(layers.RandomZoom(.05, .05)) # Breaks certain models completely (0 learning)
+    augmentation.add(layers.RandomContrast(0.7))
 
     dataset = dataset.map(
         lambda image, y: (augmentation(image, training=True), y),
@@ -125,12 +125,12 @@ def plot_model_history(history, labels_to_plot=[]):
     """
     label_count = len(labels_to_plot)
     if label_count > 0:
-        fig, axes = plt.subplots(1, label_count, figsize=(4*label_count, 4))
+        fig, axes = plt.subplots(1, label_count, figsize=(5*label_count, 5))
         for axis, label in zip(axes, labels_to_plot):
             if(isinstance(label, list)):
                 for sub_label in label:
                     axis.plot(history.history[sub_label], label=sub_label)
-                axis.legend(loc="upper right")
+                axis.legend(loc="lower right")
             else:
                 axis.plot(history.history[label], label=label)
             if 'accuracy' in label:
@@ -162,7 +162,7 @@ def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_len
         tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),
         tf.keras.callbacks.ReduceLROnPlateau(
             monitor='val_accuracy', factor=0.1, patience=int(valid_patience*0.7), 
-            min_lr=0.00001, verbose=1)
+            min_lr=5E-6, verbose=1)
     ]
 
     history = model.fit(
@@ -189,7 +189,7 @@ def fine_tune_model(
             tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
             tf.keras.callbacks.ReduceLROnPlateau(
                 monitor='val_accuracy', factor=0.1, patience=int(valid_patience*0.7), 
-                min_lr=0.00001, verbose=1)
+                min_lr=5E-6, verbose=1)
         ]
     else:
         callbacks=[]
