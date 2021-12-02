@@ -64,13 +64,14 @@ Notes:
 | 7 | DeeperVGG     | 5      | Tried minor changes and final layer of 64 + fine-tuning                           | 1E-4 | 1E-4 | 0.3     | Yes       | 0.78      | No        |
 | 7 | DeeperVGG     | HT     | Add new 1024-deep layer + more batch norm + extra dropout + conv L2               | 5E-4 | -    | -       | Yes       | 0.78      | No        |
 | 7 | DeeperVGG     | 6      | Fine tune best HT model with non-augmented data                                   | 1E-4 | 1E-3 | 0.4     | Yes       | 0.84      | No        |
+| 7 | DeeperVGG     | 7      | Train save 6 for 4 epochs with validation data                                    | 1E-4 | 1E-3 | 0.4     | No        | ~0.85     | No        |
 | 8 | VGG Res       | HT     | Hypertuning learning rate, dropout and L2                                         | 1E-3 | -    | -       | Yes       | 0.65      | No        |
 | 8 | VGG Res       | 1      | 150 epochs + learning rate decrease + fine-tuning                                 | 1E-3 | 1E-3 | 0.5     | Yes       | 0.76      | No        |
 | 8 | VGG Res       | 2      | 150 epochs + learning rate decrease                                               | 5E-4 | 1E-4 | 0.6     | Yes       | 0.70      | No        |
 | 8 | VGG Res       | 3      | Fine-tuning on save 2                                                             | 5E-4 | 1E-4 | 0.56    | No        | 0.79      | No        |
 | 9 | DeeperVGG2    | 1      | Tried 50% deeper initial layers 220 epochs + learning rate decrease               | 5E-4 | 1E-2 | 0.4     | Yes       | 0.79      | No        |
 | 9 | DeeperVGG2    | 2      | Fine-tuning on save 2                                                             | 1E-4 | 1E-2 | 0.4     | No        | 0.84      | No        |
-| 9 | DeeperVGG2    | 3      | Returned to older initial layer size, added extra 512 layer                       | 5E-4 | 1E-3 | 0.5     | Yes       | 0.69      | No        |
+| 9 | DeeperVGG2    | 3      | Train save 2 for 4 epochs with validation data                                    | 1E-4 | 1E-2 | 0.4     | No        | ~0.85     | No        |
 | X | Stacking test | 1      | Stacked best VGG, 2 good DeeperVGGs and VGG Res. Overfit to valid set by 1%       | -    | -    | -       | No        | 0.85      | Yes       |
 | X | Stacking test | 2      | Added   DeeperVGG2_2                                                              | -    | -    | -       | No        | 0.86      | Yes       |
 
@@ -98,16 +99,17 @@ Learning Rate
 - Fine-tuning with 5-10 epochs of non-augmented data can boost accuracy 5-10%
 
 GoogLeNet
-- [Main Paper](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)
+- [Original paper](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)
 - Architecture: [table of parameters](https://media.geeksforgeeks.org/wp-content/uploads/20200429201421/Inception-layer-by-layer.PNG), [diagram](https://miro.medium.com/max/5176/1*ZFPOSAted10TPd3hBQU8iQ.png)
 - [Implementation with Keras](https://machinelearningmastery.com/how-to-implement-major-architecture-innovations-for-convolutional-neural-networks/)
 
 ResNet
-- [Main Paper, including architecture](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf)
+- [Original paper, including architecture](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf)
 - [Implementation with Keras](https://machinelearningmastery.com/how-to-implement-major-architecture-innovations-for-convolutional-neural-networks/)
 
 Wide ResNet
- - [PyTorch implementation, consider trying in Keras](https://brandonmorris.dev/2018/06/30/wide-resnet-pytorch/)
+- [Original paper](https://arxiv.org/pdf/1605.07146.pdf)
+- [PyTorch implementation, consider trying in Keras](https://brandonmorris.dev/2018/06/30/wide-resnet-pytorch/)
  
 Vision Transformer
 - Transformers apparently need a lot of data (consider strong data augmentation)
