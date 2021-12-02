@@ -110,7 +110,9 @@ ResNet
 
 Wide ResNet
 - [Original paper](https://arxiv.org/pdf/1605.07146.pdf)
+- [Detail of paper](https://modelzoo.co/model/wide-residual-networks)
 - [PyTorch implementation, consider trying in Keras](https://brandonmorris.dev/2018/06/30/wide-resnet-pytorch/)
+- [Keras implementation](https://github.com/keras-team/keras-contrib/blob/master/keras_contrib/applications/wide_resnet.py), different Batch-Relu-Conv order and missing ReLU for 1x1 conv blocks of shortcuts
  
 Vision Transformer
 - Transformers apparently need a lot of data (consider strong data augmentation)
