@@ -93,7 +93,7 @@ def augment_dataset(dataset, batch_size):
     augmentation = tf.keras.Sequential()
     augmentation.add(layers.RandomFlip(mode='horizontal'))
     augmentation.add(layers.RandomRotation(0.1))
-    augmentation.add(layers.RandomTranslation((-0.25, 0.25), (-0.25, 0.25)))
+    augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
     # augmentation.add(layers.RandomZoom(.05, .05)) # Breaks certain models completely (0 learning)
     augmentation.add(layers.RandomContrast(0.7))
 
@@ -162,7 +162,7 @@ def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_len
     callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_accuracy', factor=0.2, patience=int(valid_patience*0.6), 
+            monitor='val_accuracy', factor=0.5, patience=int(valid_patience*0.4), 
             min_lr=5E-6, verbose=1)
     ]
     try:
@@ -192,7 +192,7 @@ def fine_tune_model(
         callbacks = [
             tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
             tf.keras.callbacks.ReduceLROnPlateau(
-                monitor='val_accuracy', factor=0.2, patience=int(valid_patience*0.6), 
+                monitor='val_accuracy', factor=0.5, patience=int(valid_patience*0.4), 
                 min_lr=5E-6, verbose=1)
         ]
     else:
@@ -244,7 +244,7 @@ def hypertune_model(
     tuner_callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_accuracy', factor=0.2, patience=int(valid_patience*0.6), 
+            monitor='val_accuracy', factor=0.5, patience=int(valid_patience*0.4), 
             min_lr=5E-6, verbose=1)
     ]
     if tuner_type == 'bayesian':
