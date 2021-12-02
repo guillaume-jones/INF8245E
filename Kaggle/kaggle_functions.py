@@ -162,14 +162,17 @@ def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_len
     callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_accuracy', factor=0.1, patience=int(valid_patience*0.7), 
+            monitor='val_accuracy', factor=0.2, patience=int(valid_patience*0.6), 
             min_lr=5E-6, verbose=1)
     ]
-
-    history = model.fit(
-        dataset, validation_data=valid_dataset.batch(128).cache(),
-        epochs=epochs, steps_per_epoch=epoch_length, 
-        callbacks=callbacks, verbose=1)
+    try:
+        history = model.fit(
+            dataset, validation_data=valid_dataset.batch(128).cache(),
+            epochs=epochs, steps_per_epoch=epoch_length, 
+            callbacks=callbacks, verbose=1)
+    except KeyboardInterrupt:
+        print('Training interrupted')
+        return model, None
 
     return model, history
 
@@ -189,16 +192,19 @@ def fine_tune_model(
         callbacks = [
             tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
             tf.keras.callbacks.ReduceLROnPlateau(
-                monitor='val_accuracy', factor=0.1, patience=int(valid_patience*0.7), 
+                monitor='val_accuracy', factor=0.2, patience=int(valid_patience*0.6), 
                 min_lr=5E-6, verbose=1)
         ]
     else:
         callbacks=[]
-    
-    history = model.fit(
-        dataset, validation_data=valid_dataset.batch(128).cache(),
-        epochs=epochs, steps_per_epoch=epoch_length, 
-        callbacks=callbacks, verbose=1)
+    try:
+        history = model.fit(
+            dataset, validation_data=valid_dataset.batch(128).cache(),
+            epochs=epochs, steps_per_epoch=epoch_length, 
+            callbacks=callbacks, verbose=1)
+    except KeyboardInterrupt:
+        print('Fine-tuning interrupted.')
+        return model, None
 
     return model, history
 
@@ -238,7 +244,7 @@ def hypertune_model(
     tuner_callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_accuracy', factor=0.1, patience=int(valid_patience*0.7), 
+            monitor='val_accuracy', factor=0.2, patience=int(valid_patience*0.6), 
             min_lr=5E-6, verbose=1)
     ]
     if tuner_type == 'bayesian':
@@ -259,12 +265,14 @@ def hypertune_model(
             overwrite=True)
 
     tuner.search_space_summary()
-
-    tuner.search(
-        dataset, 
-        validation_data=valid_dataset.batch(128).cache(),
-        epochs=epochs, steps_per_epoch=epoch_length,
-        callbacks=tuner_callbacks, verbose=1)
+    try:
+        tuner.search(
+            dataset, 
+            validation_data=valid_dataset.batch(128).cache(),
+            epochs=epochs, steps_per_epoch=epoch_length,
+            callbacks=tuner_callbacks, verbose=1)
+    except KeyboardInterrupt:
+        print('Tuner interrupted.')
 
     tuner.results_summary()
 
