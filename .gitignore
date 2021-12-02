@@ -3,6 +3,7 @@ __pycache__
 *.py[cod]
 pip-log.txt
 pip-delete-this-directory.txt
+**.ipynb_checkpoints
 
 # Cannot include .pkl of datasets since they are too large
 *.pkl

@@ -3,33 +3,36 @@ import tensorflow.keras.layers as layers
 import tensorflow.keras.regularizers as reg
 import keras_tuner as kt
 
-# Epochs for training : 
-# Good validation patience : 
-# Good fine-tuning lr : 
+# Epochs for training : 150+
+# Good validation patience : ?
+# Good fine-tuning lr : ?
 
 class Model(kt.HyperModel):
     def residual_module(self, input, filters, stride=1, l2_reg=0, dropout=0.3):
-        # Applies relu convolution, then linear convolution before shortcut
+        # Applies batch norm and relu to BOTH convolutions and shortcut
         bn_1 = layers.BatchNormalization()(input)
+        relu_1 = layers.ReLU()(bn_1)
+
+        # Convolution side 
         conv_1 = layers.Conv2D(
             filters, kernel_size=(3,3), strides=(stride, stride),
             padding='same', kernel_initializer='he_normal',
-            kernel_regularizer=reg.l2(l2_reg), use_bias=False)(bn_1)
+            kernel_regularizer=reg.l2(l2_reg), use_bias=False)(relu_1)
         dropout = layers.Dropout(dropout)(conv_1)
         bn_2 = layers.BatchNormalization()(dropout)
+        relu_2 = layers.ReLU()(bn_2)
         conv_2 = layers.Conv2D(
             filters, kernel_size=(3,3), strides=(1,1),
             padding='same', kernel_initializer='he_normal',
-            kernel_regularizer=reg.l2(l2_reg), use_bias=False)(bn_2)
+            kernel_regularizer=reg.l2(l2_reg), use_bias=False)(relu_2)
         
         # Ensures shortcut is correct depth by adding a 1x1 convolution
         if input.shape[-1] != filters:
-            shortcut_bn = layers.BatchNormalization()(input)
-            shortcut_relu = layers.ReLU(negative_slope=0)(shortcut_bn)
             shortcut = layers.Conv2D(
                 filters, kernel_size=(3,3), strides=(stride,stride),
                 padding='same', kernel_initializer='he_normal',
-                kernel_regularizer=reg.l2(l2_reg), use_bias=False)(shortcut_relu)
+                kernel_regularizer=reg.l2(l2_reg), use_bias=False)(relu_1)
+        # If a convolution is not needed, no batch/activation are used for the shortcut
         else:
             shortcut = input
 
@@ -61,27 +64,27 @@ class Model(kt.HyperModel):
         else:
             conv_dropout = 0.3
             l2_reg = 0.00001
-            k=8
-            n=3
+            k=12
+            n=1
 
         # Fixed hyperparameters
-        dense_dropout = 0.3
-        learning_rate = 0.001
+        dense_dropout = conv_dropout
+        learning_rate = 0.0005
 
         input_layer = layers.Input(shape=(96, 96, 1))
 
         # WideResNet, conv group 1 (input)
-        output = self.conv_layer(input_layer, 16, l2_reg=l2_reg)
+        output = self.conv_layer(input_layer, 16, 2, l2_reg=l2_reg)
 
         # WideResNet, conv group 2
-        output = self.residual_module(output, 16 * k, 2, l2_reg=l2_reg, dropout=conv_dropout)
+        output = self.residual_module(output, 16 * k, 2, l2_reg=l2_reg, dropout=conv_dropout/4)
         for i in range(n - 1):
-            output = self.residual_module(output, 16 * k, l2_reg=l2_reg, dropout=conv_dropout)
+            output = self.residual_module(output, 16 * k, l2_reg=l2_reg, dropout=conv_dropout/4)
 
         # WideResNet, conv group 3
-        output = self.residual_module(output, 32 * k, 2, l2_reg=l2_reg, dropout=conv_dropout)
+        output = self.residual_module(output, 32 * k, 2, l2_reg=l2_reg, dropout=conv_dropout/2)
         for i in range(n - 1):
-            output = self.residual_module(output, 32 * k, l2_reg=l2_reg, dropout=conv_dropout)
+            output = self.residual_module(output, 32 * k, l2_reg=l2_reg, dropout=conv_dropout/2)
         
         # WideResNet, conv group 4
         output = self.residual_module(output, 64 * k, 2, l2_reg=l2_reg, dropout=conv_dropout)
