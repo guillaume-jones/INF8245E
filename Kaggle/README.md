@@ -73,7 +73,8 @@ Notes:
 | 9 | DeeperVGG2    | 2      | Fine-tuning on save 2                                                             | 1E-4 | 1E-2 | 0.4     | No        | 0.84      | No        |
 | 9 | DeeperVGG2    | 3      | Train save 2 for 4 epochs with validation data                                    | 1E-4 | 1E-2 | 0.4     | No        | ~0.85     | No        |
 | X | Stacking test | 1      | Stacked best VGG, 2 good DeeperVGGs and VGG Res. Overfit to valid set by 1%       | -    | -    | -       | No        | 0.85      | Yes       |
-| X | Stacking test | 2      | Added   DeeperVGG2_2                                                              | -    | -    | -       | No        | 0.86      | Yes       |
+| X | Stacking test | 2      | Added DeeperVGG2_2                                                                | -    | -    | -       | No        | 0.86      | Yes       |
+| X | Stacking test | 3      | Try stacking DVGG_7 and DVGG2_3 (train + valid). Improved performance 0.5%        | -    | -    | -       | No        | 0.87      | Yes       |
 
 Stacking test:
 - Altered data to give more weight to models with higher accuracy and confidence
