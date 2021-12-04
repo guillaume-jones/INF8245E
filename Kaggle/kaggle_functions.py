@@ -27,7 +27,7 @@ def load_test_set():
     """
     return open_pickled_file('data/x_test.pkl') / 255.0
 
-def load_train_set(resnet=False):
+def load_train_set():
     """
     Open Kaggle competition image dataset
     Scale images to floats and replace labels with class numbers
@@ -37,11 +37,7 @@ def load_train_set(resnet=False):
     x_train = open_pickled_file('data/x_train.pkl') / 255.0
 
     # Add extra dimension to images for "channels"
-    if resnet:
-        x_train = np.stack([x_train, x_train, x_train], axis=3)
-        x_train = tf.keras.applications.resnet_v2.preprocess_input(x_train)
-    else:
-        x_train = np.reshape(x_train, (-1, 96, 96, 1))
+    x_train = np.reshape(x_train, (-1, 96, 96, 1))
     
 
     # Open y_train and convert to numbers
@@ -62,12 +58,12 @@ def load_train_set(resnet=False):
 
     return x_train, y_train, x_train_partial, y_train_partial, x_valid, y_valid
     
-def load_train_as_dataset(return_complete_set=False, resnet=False):
+def load_train_as_dataset(return_complete_set=False):
     """
     Convert numpy or other dataset to TensorFlow Dataset
     Batch using batch_size
     """
-    x_train, y_train, x_train_partial, y_train_partial, x_valid, y_valid = load_train_set(resnet)
+    x_train, y_train, x_train_partial, y_train_partial, x_valid, y_valid = load_train_set()
     
     train_dataset = tf.data.Dataset.from_tensor_slices((x_train_partial, y_train_partial))
     valid_dataset = tf.data.Dataset.from_tensor_slices((x_valid, y_valid))
