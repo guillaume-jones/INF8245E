@@ -3,7 +3,7 @@ import tensorflow.keras.layers as layers
 import tensorflow.keras.regularizers as reg
 import keras_tuner as kt
 
-# Epochs for training : 150+ (256 minutes)
+# Epochs for training : 150+ (250-300 minutes)
 # Good validation patience : 15-20
 # Good fine-tuning lr : ?
 
@@ -57,16 +57,18 @@ class Model(kt.HyperModel):
     def build(self, hyperparameters):
         # Tunable hyperparameters
         if hyperparameters is not None:
-            conv_dropout = hyperparameters.Float('conv_dropout', 0.3, 0.6, step=0.3)
+            conv_dropout = hyperparameters.Float('conv_dropout', 0.3, 0.5, step=0.2)
             #l2_reg = hyperparameters.Float('l2_reg', 0.0001, 0.01, sampling='log')
-            #k = hyperparameters.Int('k', 8, 12, step=2)
-            n = hyperparameters.Int('n', 1, 2)
+            k = hyperparameters.Int('k', 6, 12, step=3)
+            # n = hyperparameters.Int('n', 1, 2)
         else:
             conv_dropout = 0.5
-            n=1
+            l2_reg = 0.0001
+            n=2
+            k=10
 
         # Fixed hyperparameters
-        k=10
+        n=2
         l2_reg = 0.0001
         dense_dropout = conv_dropout
         learning_rate = 0.0005

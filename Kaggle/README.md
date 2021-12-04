@@ -73,9 +73,17 @@ Notes:
 | 9  | DeeperVGG2    | 2      | Fine-tuning on save 2                                                             | 1E-4 | 1E-2 | 0.4     | No        | 0.84      | No        |
 | 9  | DeeperVGG2    | 3      | Train save 2 for 4 epochs with validation data                                    | 1E-4 | 1E-2 | 0.4     | No        | ~0.85     | No        |
 | 10 | WideResNet    | 0      | First WideResNet, train for 50 epochs (9 hours!), wildly variable performance     | 1E-3 | 1E-4 | 0.4     | Yes       | ~0.60     | No        |
+| 10 | WideResNet    | 1      | Shrink WideResNet to n=2, k=10-12, with low regularization                        | 5E-4 | 1E-4 | 0.3     | Yes       | 0.67      | No        |
+| 10 | WideResNet    | 2      | Train model with n=2, k=8                                                         | 5E-4 | 1E-4 | 0.4     | Yes       | 0.73      | No        |
+| 10 | WideResNet    | 3      | Fine tune save 2 with non-augmented data                                          | 1E-5 | 1E-4 | 0.4     | No        | 0.80      | No        |
+| 10 | WideResNet    | HT1    | Train 2 models, n=1 and drop=0.6 and n=2 and drop=0.3 (best)                      | 5E-4 | 1E-5 | -       | Yes       | 0.77      | No        |
+| 10 | WideResNet    | 4      | Fine tune best model from HT1 with non-augmented data                             | 1E-5 | 1E-4 | 0.3     | No        | 0.81      | No        |
+| 10 | WideResNet    | HT2    | Train 3 models with n=2, dropout 0.3 or 0.5 and k=6 or 9                          | 5E-4 | 1E-4 | -       | Yes       | 0.80      | No        |
+| 10 | WideResNet    | 5      | Fine tune best model from HT2 with non-augmented data                             | 1E-5 | 1E-4 | 0.4     | No        | 0.84      | No        |
 | X  | Stacking test | 1      | Stacked best VGG, 2 good DeeperVGGs and VGG Res. Overfit to valid set by 1%       | -    | -    | -       | No        | 0.85      | Yes       |
 | X  | Stacking test | 2      | Added DeeperVGG2_2                                                                | -    | -    | -       | No        | 0.86      | Yes       |
 | X  | Stacking test | 3      | Try stacking DVGG_7 and DVGG2_3 (train + valid). Improved performance 0.5%        | -    | -    | -       | No        | 0.87      | Yes       |
+| X  | Stacking test | 3      | Added WideResNet_4 to list from stacking test 2.                                  | -    | -    | -       | No        | 0.86      | Yes       |
 
 Stacking test:
 - Altered data to give more weight to models with higher accuracy and confidence
