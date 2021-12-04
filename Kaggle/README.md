@@ -83,7 +83,8 @@ Notes:
 | X  | Stacking test | 1      | Stacked best VGG, 2 good DeeperVGGs and VGG Res. Overfit to valid set by 1%       | -    | -    | -       | No        | 0.85      | Yes       |
 | X  | Stacking test | 2      | Added DeeperVGG2_2                                                                | -    | -    | -       | No        | 0.86      | Yes       |
 | X  | Stacking test | 3      | Try stacking DVGG_7 and DVGG2_3 (train + valid). Improved performance 0.5%        | -    | -    | -       | No        | 0.87      | Yes       |
-| X  | Stacking test | 3      | Added WideResNet_4 to list from stacking test 2.                                  | -    | -    | -       | No        | 0.86      | Yes       |
+| X  | Stacking test | 4      | Added WideResNet_4 to list from stacking test 2.                                  | -    | -    | -       | No        | 0.86      | Yes       |
+| X  | Stacking test | 5      | Added WideResNet_5 to list from stacking test 4.                                  | -    | -    | -       | No        | 0.87      | Yes       |
 
 Stacking test:
 - Altered data to give more weight to models with higher accuracy and confidence
