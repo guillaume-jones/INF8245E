@@ -251,7 +251,7 @@ def hypertune_model(
         tuner = kt.BayesianOptimization(model,
             objective='val_accuracy',
             max_trials=trials,
-            seed=1,
+            seed=2,
             directory=f'models/{model_number}',
             project_name=tuner_filepath,
             overwrite=True)
@@ -259,7 +259,7 @@ def hypertune_model(
         tuner = kt.RandomSearch(model,
             objective='val_accuracy',
             max_trials=trials,
-            seed=1,
+            seed=2,
             directory=f'models/{model_number}',
             project_name=tuner_filepath,
             overwrite=True)
