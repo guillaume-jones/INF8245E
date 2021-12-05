@@ -43,7 +43,6 @@ def load_train_set():
     # Open y_train and convert to numbers
     y_train_raw = open_pickled_file('data/y_train.pkl')
 
-
     # Convert word labels to numbers
     y_dictionary = get_label_dictionary()
     y_train = np.zeros(y_train_raw.shape, dtype=int)
@@ -53,6 +52,7 @@ def load_train_set():
     # Add extra dimension to images for conversion to dataset
     y_train = np.reshape(y_train, (-1, 1))
 
+    # Split out a validation set
     x_train_partial, x_valid, y_train_partial, y_valid = train_test_split(
         x_train, y_train, test_size=0.2, random_state=1)
 
@@ -63,13 +63,13 @@ def load_train_as_dataset(return_complete_set=False):
     Convert numpy or other dataset to TensorFlow Dataset
     Batch using batch_size
     """
-    x_train, y_train, x_train_partial, y_train_partial, x_valid, y_valid = load_train_set()
+    x_complete, y_complete, x_train, y_train, x_valid, y_valid = load_train_set()
     
-    train_dataset = tf.data.Dataset.from_tensor_slices((x_train_partial, y_train_partial))
+    train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
     valid_dataset = tf.data.Dataset.from_tensor_slices((x_valid, y_valid))
 
     if return_complete_set:
-        complete_train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+        complete_train_dataset = tf.data.Dataset.from_tensor_slices((x_complete, y_complete))
         return complete_train_dataset, train_dataset, valid_dataset, y_valid
     
     return train_dataset, valid_dataset, y_valid
@@ -89,7 +89,7 @@ def augment_dataset(dataset, batch_size):
     augmentation = tf.keras.Sequential()
     augmentation.add(layers.RandomFlip(mode='horizontal'))
     augmentation.add(layers.RandomRotation(0.1))
-    augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
+    augmentation.add(layers.RandomTranslation((-0.25, 0.25), (-0.25, 0.25)))
     # augmentation.add(layers.RandomZoom(.05, .05)) # Breaks certain models completely (0 learning)
     augmentation.add(layers.RandomContrast(0.7))
 
@@ -158,7 +158,7 @@ def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_len
     callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_accuracy', factor=0.5, patience=int(valid_patience*0.4), 
+            monitor='val_accuracy', factor=0.5, patience=round(valid_patience*0.5), 
             min_lr=5E-6, verbose=1)
     ]
     try:
@@ -188,7 +188,7 @@ def fine_tune_model(
         callbacks = [
             tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
             tf.keras.callbacks.ReduceLROnPlateau(
-                monitor='val_accuracy', factor=0.5, patience=int(valid_patience*0.4), 
+                monitor='val_accuracy', factor=0.5, patience=round(valid_patience*0.5), 
                 min_lr=5E-6, verbose=1)
         ]
     else:
@@ -240,7 +240,7 @@ def hypertune_model(
     tuner_callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_accuracy', factor=0.5, patience=int(valid_patience*0.4), 
+            monitor='val_accuracy', factor=0.5, patience=round(valid_patience*0.5), 
             min_lr=5E-6, verbose=1)
     ]
     if tuner_type == 'bayesian':
