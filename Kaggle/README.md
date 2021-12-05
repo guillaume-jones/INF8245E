@@ -78,8 +78,9 @@ Notes:
 | 10 | WideResNet    | 3      | Fine tune save 2 with non-augmented data                                          | 1E-5 | 1E-4 | 0.4     | No        | 0.80      | No        |
 | 10 | WideResNet    | HT1    | Train 2 models, n=1 and drop=0.6 and n=2 and drop=0.3 (best)                      | 5E-4 | 1E-5 | -       | Yes       | 0.77      | No        |
 | 10 | WideResNet    | 4      | Fine tune best model from HT1 with non-augmented data                             | 1E-5 | 1E-4 | 0.3     | No        | 0.81      | No        |
-| 10 | WideResNet    | HT2    | Train 3 models with n=2, dropout 0.3 or 0.5 and k=6 or 9                          | 5E-4 | 1E-4 | -       | Yes       | 0.80      | No        |
+| 10 | WideResNet    | HT2    | Train 3 models with n=2, dropout 0.3 or 0.5 and k=6 or 9 (best 0.5 and 9)         | 5E-4 | 1E-4 | -       | Yes       | 0.80      | No        |
 | 10 | WideResNet    | 5      | Fine tune best model from HT2 with non-augmented data                             | 1E-5 | 1E-4 | 0.4     | No        | 0.84      | No        |
+| 10 | WideResNet    | 6      | Try a similar model to 3, but with SpatialDropout2D and higher L2                 | 5E-4 | 1E-3 | 0.4     | Yes       | 0.60      | No        |
 | 11 | Stacking      | HT     | Try different dropouts and L2 regs for stacking                                   | 5E-5 | -    | -       | No        | 0.87      | Yes       |
 | X  | Stacking test | 1      | Stacked best VGG, 2 good DeeperVGGs and VGG Res. Overfit to valid set by 1%       | -    | -    | -       | No        | 0.85      | Yes       |
 | X  | Stacking test | 2      | Added DeeperVGG2_2                                                                | -    | -    | -       | No        | 0.86      | Yes       |

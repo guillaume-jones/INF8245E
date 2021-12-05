@@ -4,8 +4,8 @@ import tensorflow.keras.layers as layers
 import tensorflow.keras.regularizers as reg
 import keras_tuner as kt
 
-# Epochs for training : 
-# Good validation patience : 
+# Epochs for training : 10-20
+# Good validation patience : 2-4
 # Good fine-tuning lr : 
 
 class Model(kt.HyperModel):

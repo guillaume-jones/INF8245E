@@ -89,7 +89,7 @@ def augment_dataset(dataset, batch_size):
     augmentation = tf.keras.Sequential()
     augmentation.add(layers.RandomFlip(mode='horizontal'))
     augmentation.add(layers.RandomRotation(0.1))
-    augmentation.add(layers.RandomTranslation((-0.25, 0.25), (-0.25, 0.25)))
+    augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
     # augmentation.add(layers.RandomZoom(.05, .05)) # Breaks certain models completely (0 learning)
     augmentation.add(layers.RandomContrast(0.7))
 

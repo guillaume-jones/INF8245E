@@ -18,7 +18,7 @@ class Model(kt.HyperModel):
             filters, kernel_size=(3,3), strides=(stride, stride),
             padding='same', kernel_initializer='he_normal',
             kernel_regularizer=reg.l2(l2_reg), use_bias=False)(relu_1)
-        dropout = layers.Dropout(dropout)(conv_1)
+        dropout = layers.SpatialDropout2D(dropout)(conv_1)
         bn_2 = layers.BatchNormalization()(dropout)
         relu_2 = layers.ReLU()(bn_2)
         conv_2 = layers.Conv2D(
@@ -57,20 +57,16 @@ class Model(kt.HyperModel):
     def build(self, hyperparameters):
         # Tunable hyperparameters
         if hyperparameters is not None:
-            conv_dropout = hyperparameters.Float('conv_dropout', 0.3, 0.5, step=0.2)
-            #l2_reg = hyperparameters.Float('l2_reg', 0.0001, 0.01, sampling='log')
+            l2_reg = hyperparameters.Float('l2_reg', 0.0001, 0.01, sampling='log')
             k = hyperparameters.Int('k', 6, 12, step=3)
-            # n = hyperparameters.Int('n', 1, 2)
         else:
-            conv_dropout = 0.5
-            l2_reg = 0.0001
-            n=2
-            k=10
+            l2_reg = 0.001
+            k=9
 
         # Fixed hyperparameters
         n=2
-        l2_reg = 0.0001
-        dense_dropout = conv_dropout
+        conv_dropout = 0.5
+        dense_dropout = 0.5
         learning_rate = 0.0005
 
         input_layer = layers.Input(shape=(96, 96, 1))
@@ -79,9 +75,9 @@ class Model(kt.HyperModel):
         output = self.conv_layer(input_layer, 16, 2, l2_reg=l2_reg)
 
         # WideResNet, conv group 2
-        output = self.residual_module(output, 16 * k, 2, l2_reg=l2_reg, dropout=conv_dropout/3)
+        output = self.residual_module(output, 16 * k, 2, l2_reg=l2_reg)
         for i in range(n - 1):
-            output = self.residual_module(output, 16 * k, l2_reg=l2_reg, dropout=conv_dropout/3)
+            output = self.residual_module(output, 16 * k, l2_reg=l2_reg)
 
         # WideResNet, conv group 3
         output = self.residual_module(output, 32 * k, 2, l2_reg=l2_reg, dropout=conv_dropout/2)
