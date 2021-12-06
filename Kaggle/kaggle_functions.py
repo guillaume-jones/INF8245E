@@ -146,7 +146,7 @@ def show_reconstructions(dataset, count, model):
     plt.figure(figsize=(10, 10))
     for i, reconstructed in enumerate(reconstructed[:count]):
         ax = plt.subplot(3, 3, i + 1)
-        plt.imshow(reconstructed, cmap=plt.cm.gray)
+        plt.imshow(reconstructed.squeeze(), cmap=plt.cm.gray)
         plt.axis("off")
     plt.show()
 
