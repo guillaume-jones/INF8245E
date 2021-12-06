@@ -92,6 +92,8 @@ Notes:
 | X  | Basic stack   | 4      | Added WideResNet_4 to list from Basic stack 2.                                    | -    | -    | -       | No        | 0.86      | Yes       |
 | X  | Basic stack   | 5      | Added WideResNet_5 to list from Basic stack 4.                                    | -    | -    | -       | No        | 0.87      | Yes       |
 | X  | Basic stack   | 6      | Tweak prob and accuracy rating to 1 and 13                                        | -    | -    | -       | No        | 0.87      | Yes       |
+| X  | Basic stack   | 7      | Add WideResNet_8 and use 1 and 7 prob/accuracy                                    | -    | -    | -       | No        | 0.87      | Yes       |
+| X  | Basic stack   | 8      | Repeat save 7 with prob/accuracy of 4 and 8. Worse results! (avoid prob>1)        | -    | -    | -       | No        | 0.86      | Yes       |
 
 Basic stack:
 - Altered data to give more weight to models with higher accuracy and confidence
