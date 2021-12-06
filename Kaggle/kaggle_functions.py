@@ -179,10 +179,14 @@ def fine_tune_model(
     Fine-tune existing models. Uses epoch_length if using an infinite dataset (like augmented), otherwise set to None
     """
     if learning_rate is not None:
-        model.compile(
+        fine_model = tf.keras.models.clone_model(model)
+        fine_model.compile(
             optimizer=tf.keras.optimizers.Nadam(learning_rate),
             loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
             metrics=['accuracy'])
+        fine_model.set_weights(model.get_weights())
+    else:
+        fine_model = model
 
     if valid_patience is not None:
         callbacks = [
@@ -193,16 +197,17 @@ def fine_tune_model(
         ]
     else:
         callbacks=[]
+
     try:
-        history = model.fit(
+        history = fine_model.fit(
             dataset, validation_data=valid_dataset.batch(128).cache(),
             epochs=epochs, steps_per_epoch=epoch_length, 
             callbacks=callbacks, verbose=1)
     except KeyboardInterrupt:
         print('Fine-tuning interrupted.')
-        return model, None
+        return fine_model, None
 
-    return model, history
+    return fine_model, history
 
 def fine_tune_model_filepath(
     model_filepath, dataset, valid_dataset, epochs, 
