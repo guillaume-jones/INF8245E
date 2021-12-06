@@ -57,16 +57,18 @@ class Model(kt.HyperModel):
     def build(self, hyperparameters):
         # Tunable hyperparameters
         if hyperparameters is not None:
-            l2_reg = hyperparameters.Float('l2_reg', 0.0001, 0.01, sampling='log')
-            k = hyperparameters.Int('k', 6, 12, step=3)
+            #l2_reg = hyperparameters.Float('l2_reg', 0.0001, 0.01, sampling='log')
+            k = hyperparameters.Int('k', 10, 12, step=2)
+            n = hyperparameters.Int('n', 2, 3, step=1)
+            conv_dropout = hyperparameters.Float('conv_dropout', 0.4, 0.6, step=0.2)
         else:
-            l2_reg = 0.001
-            k=9
+            k=12
+            n=2
+            conv_dropout = 0.5
 
         # Fixed hyperparameters
-        n=2
-        conv_dropout = 0.5
-        dense_dropout = 0.5
+        l2_reg = 0.0002
+        dense_dropout = conv_dropout
         learning_rate = 0.0005
 
         input_layer = layers.Input(shape=(96, 96, 1))
@@ -75,9 +77,9 @@ class Model(kt.HyperModel):
         output = self.conv_layer(input_layer, 16, 2, l2_reg=l2_reg)
 
         # WideResNet, conv group 2
-        output = self.residual_module(output, 16 * k, 2, l2_reg=l2_reg)
+        output = self.residual_module(output, 16 * k, 2, l2_reg=l2_reg, dropout=conv_dropout/3)
         for i in range(n - 1):
-            output = self.residual_module(output, 16 * k, l2_reg=l2_reg)
+            output = self.residual_module(output, 16 * k, l2_reg=l2_reg, dropout=conv_dropout/3)
 
         # WideResNet, conv group 3
         output = self.residual_module(output, 32 * k, 2, l2_reg=l2_reg, dropout=conv_dropout/2)
