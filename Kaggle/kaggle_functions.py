@@ -66,13 +66,31 @@ def load_train_as_dataset(return_complete_set=False):
     x_complete, y_complete, x_train, y_train, x_valid, y_valid = load_train_set()
     
     train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-    valid_dataset = tf.data.Dataset.from_tensor_slices((x_valid, y_valid))
+    valid_dataset = tf.data.Dataset.from_tensor_slices((x_valid, y_valid)).batch(128).cache()
 
     if return_complete_set:
         complete_train_dataset = tf.data.Dataset.from_tensor_slices((x_complete, y_complete))
         return complete_train_dataset, train_dataset, valid_dataset, y_valid
     
     return train_dataset, valid_dataset, y_valid
+
+def load_train_as_dataset_autoencoder():
+    _, _, x_train, y_train, x_valid, y_valid = load_train_set()
+
+    x_train_classes = []
+    x_valid_classes = []
+    for i in range(11):
+        x_train_classes.append(x_train[y_train.flatten() == i])
+        x_valid_classes.append(x_valid[y_valid.flatten() == i])
+
+    train_datasets = [tf.data.Dataset.from_tensor_slices((x_train, x_train)).batch(32).cache()
+        for x_train in x_train_classes]
+
+    valid_datasets = [tf.data.Dataset.from_tensor_slices((x_valid, x_valid)).batch(128).cache() 
+        for x_valid in x_valid_classes]
+
+    return train_datasets, valid_datasets
+
 
 def augment_dataset(dataset, batch_size):
     """
@@ -108,6 +126,26 @@ def show_images(dataset, count):
             plt.title(labels[i].numpy()[0])
             plt.axis("off")
         plt.show()
+
+def show_images_autoencoder(model, dataset, count):
+    reconstructed = model.predict(dataset.take(1))
+
+    plt.figure(figsize=(10, 10))
+    for images, _ in dataset.take(1):
+        for i in range(count):
+            ax = plt.subplot(3, 3, i + 1)
+            plt.imshow(images[i].numpy(), cmap=plt.cm.gray)
+            plt.axis("off")
+        plt.show()
+    plt.show()
+
+    plt.figure(figsize=(10, 10))
+    for i, reconstructed in enumerate(reconstructed[:count]):
+        ax = plt.subplot(3, 3, i + 1)
+        plt.imshow(reconstructed, cmap=plt.cm.gray)
+        plt.axis("off")
+    plt.show()
+
 
 def print_accuracy(y_true, y_pred):
     """
@@ -151,21 +189,23 @@ def plot_confusion_matrix(y_true, y_pred):
     plt.show()
 
 
-def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_length=None):
+def train_model(
+    model, dataset, valid_dataset, epochs, 
+    valid_patience, epoch_length=None, patience_metric='val_accuracy'):
     """
     Trains models from scratch
     """
     callbacks = [
-        tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),
+        tf.keras.callbacks.EarlyStopping(monitor=patience_metric, patience=valid_patience),
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_accuracy', factor=0.5, patience=round(valid_patience*0.5), 
+            monitor=patience_metric, factor=0.5, patience=round(valid_patience*0.5), 
             min_lr=5E-6, verbose=1)
     ]
     try:
         history = model.fit(
-            dataset, validation_data=valid_dataset.batch(128).cache(),
+            dataset, validation_data=valid_dataset,
             epochs=epochs, steps_per_epoch=epoch_length, 
-            callbacks=callbacks, verbose=1)
+            callbacks=callbacks, verbose=2)
     except KeyboardInterrupt:
         print('Training interrupted')
         return model, None
@@ -200,7 +240,7 @@ def fine_tune_model(
 
     try:
         history = fine_model.fit(
-            dataset, validation_data=valid_dataset.batch(128).cache(),
+            dataset, validation_data=valid_dataset,
             epochs=epochs, steps_per_epoch=epoch_length, 
             callbacks=callbacks, verbose=1)
     except KeyboardInterrupt:
@@ -269,7 +309,7 @@ def hypertune_model(
     try:
         tuner.search(
             dataset, 
-            validation_data=valid_dataset.batch(128).cache(),
+            validation_data=valid_dataset,
             epochs=epochs, steps_per_epoch=epoch_length,
             callbacks=tuner_callbacks, verbose=1)
     except KeyboardInterrupt:
