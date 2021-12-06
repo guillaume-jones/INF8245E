@@ -16,6 +16,13 @@ class Model(kt.HyperModel):
 
         return base_model(inputs, training=False)
 
+    def dense_layer(self, inputs, size, l2_reg=0, dropout=0, activation='elu'):
+        output = layers.Dropout(dropout)(inputs)
+        return layers.Dense(
+            size, activation=activation,
+            kernel_regularizer=reg.l2(l2_reg), 
+            bias_regularizer=reg.l2(l2_reg))(output)
+
     def build(self, hyperparameters):
         # Tunable hyperparameters
         if hyperparameters is not None:
@@ -27,16 +34,16 @@ class Model(kt.HyperModel):
             l2_reg = 0.0001
 
         # Fixed hyperparameters
-        dense_activation = 'elu'
-        learning_rate = 0.00005
+        learning_rate = 0.00001
         base_model_filepaths = [
             'model6/VGG_6_79',
             'model7/DeeperVGG_4_79',
             'model7/DeeperVGG_6_84',
             'model8/VGGRes_3_79',
             'model9/DeeperVGG2_2_84',
-            'model10/WideResNet_4_81',
-            'model10/WideResNet_5_84'
+            'model10/WideResNet_3_80',
+            'model10/WideResNet_5_84',
+            'model10/WideResNet_8_83',
         ]
 
         # Same input for all models (accepts augmented data)
@@ -47,16 +54,11 @@ class Model(kt.HyperModel):
         for filepath in base_model_filepaths:
             base_models.append(self.load_base_model(input_layer, f'models/{filepath}'))
 
-        # Concatenates models before 1 final learnt layer
+        # Concatenates models before final trained layers
         output = layers.concatenate(base_models)
-        output = layers.Dropout(dropout)(output)
-        output = layers.Dense(
-            512, activation=dense_activation,
-            kernel_regularizer=reg.l2(l2_reg), bias_regularizer=reg.l2(l2_reg))(output)
-        output = layers.Dropout(dropout)(output)
-        output = layers.Dense(
-            11, kernel_regularizer=reg.l2(l2_reg), 
-            bias_regularizer=reg.l2(l2_reg))(output)
+        output = self.dense_layer(output, 256, l2_reg, dropout)
+        output = self.dense_layer(output, 256, l2_reg, dropout)
+        output = self.dense_layer(output, 11, l2_reg, dropout, activation=None)
 
         model = keras.models.Model(inputs=input_layer, outputs=output, name='stacked_model')
 
