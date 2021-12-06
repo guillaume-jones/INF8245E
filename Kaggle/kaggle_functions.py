@@ -83,8 +83,7 @@ def load_train_as_dataset_autoencoder():
         x_train_classes.append(x_train[y_train.flatten() == i])
         x_valid_classes.append(x_valid[y_valid.flatten() == i])
 
-    train_datasets = [tf.data.Dataset.from_tensor_slices((x_train, x_train)).batch(32).cache()
-        for x_train in x_train_classes]
+    train_datasets = [tf.data.Dataset.from_tensor_slices((x_train, x_train)) for x_train in x_train_classes]
 
     valid_datasets = [tf.data.Dataset.from_tensor_slices((x_valid, x_valid)).batch(128).cache() 
         for x_valid in x_valid_classes]
@@ -92,7 +91,7 @@ def load_train_as_dataset_autoencoder():
     return train_datasets, valid_datasets
 
 
-def augment_dataset(dataset, batch_size):
+def augment_dataset(dataset, batch_size, autoencoder=False):
     """
     Augment images from training set with standard augmentations
     Also repeat and shuffle data for good training
@@ -106,7 +105,7 @@ def augment_dataset(dataset, batch_size):
 
     augmentation = tf.keras.Sequential()
     augmentation.add(layers.RandomFlip(mode='horizontal'))
-    augmentation.add(layers.RandomRotation(0.1))
+    augmentation.add(layers.RandomRotation(0.07))
     augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
     # augmentation.add(layers.RandomZoom(.05, .05)) # Breaks certain models completely (0 learning)
     augmentation.add(layers.RandomContrast(0.7))
@@ -114,6 +113,11 @@ def augment_dataset(dataset, batch_size):
     dataset = dataset.map(
         lambda image, y: (augmentation(image, training=True), y),
         num_parallel_calls=tf.data.AUTOTUNE)
+
+    if autoencoder:
+        dataset = dataset.map(
+            lambda image, _: (image, image),
+            num_parallel_calls=tf.data.AUTOTUNE)
 
     return dataset.prefetch(buffer_size=tf.data.AUTOTUNE), epoch_length
 
@@ -127,14 +131,14 @@ def show_images(dataset, count):
             plt.axis("off")
         plt.show()
 
-def show_images_autoencoder(model, dataset, count):
+def show_reconstructions(dataset, count, model):
     reconstructed = model.predict(dataset.take(1))
 
     plt.figure(figsize=(10, 10))
     for images, _ in dataset.take(1):
         for i in range(count):
             ax = plt.subplot(3, 3, i + 1)
-            plt.imshow(images[i].numpy(), cmap=plt.cm.gray)
+            plt.imshow(images[i].numpy().squeeze(), cmap=plt.cm.gray)
             plt.axis("off")
         plt.show()
     plt.show()
