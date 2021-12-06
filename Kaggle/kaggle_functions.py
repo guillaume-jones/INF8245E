@@ -224,9 +224,9 @@ def train_model(
         tf.keras.callbacks.EarlyStopping(monitor=patience_metric, patience=valid_patience),
         
     ]
-    if learning_rate_schedule is 'constant':
+    if learning_rate_schedule == 'constant':
         pass
-    elif learning_rate_schedule is 'decrease':
+    elif learning_rate_schedule == 'decrease':
         callbacks.append(tf.keras.callbacks.ReduceLROnPlateau(
             monitor=patience_metric, factor=0.5, 
             patience=round(valid_patience*0.6), 
@@ -319,9 +319,9 @@ def hypertune_model(
     tuner_callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor=patience_metric, patience=valid_patience),  
     ]
-    if learning_rate_schedule is 'constant':
+    if learning_rate_schedule == 'constant':
         pass
-    elif learning_rate_schedule is 'decrease':
+    elif learning_rate_schedule == 'decrease':
         tuner_callbacks.append(tf.keras.callbacks.ReduceLROnPlateau(
             monitor=patience_metric, factor=0.5, 
             patience=round(valid_patience*0.6), 
