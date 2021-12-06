@@ -192,19 +192,48 @@ def plot_confusion_matrix(y_true, y_pred):
     confusion_matrix_display.figure_.set_size_inches(10, 10)
     plt.show()
 
+class CycleScheduler:
+    def __init__(self, peak_lr, mid_epoch):
+        self.peak_lr = peak_lr
+        self.mid_epoch = mid_epoch
+    
+    def scheduler(self, epoch, lr):
+        # Initial ramp-up
+        if epoch <= self.mid_epoch:
+            return epoch * (self.peak_lr*0.8 / self.mid_epoch) + self.peak_lr * 0.2
+        # Terminal low learning rate
+        elif epoch > self.mid_epoch * 2:
+            return self.peak_lr * 0.2
+        # Ramp-down
+        else:
+
+            return epoch * -(self.peak_lr*0.8 / self.mid_epoch) + self.peak_lr * 1.8
+    
+    def callback(self):
+        return self.scheduler
+
 
 def train_model(
-    model, dataset, valid_dataset, epochs, 
-    valid_patience, epoch_length=None, patience_metric='val_accuracy'):
+    model, dataset, valid_dataset, epochs, epoch_length=None, 
+    valid_patience=0, patience_metric='val_accuracy', 
+    learning_rate_schedule='decrease'):
     """
     Trains models from scratch
     """
     callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor=patience_metric, patience=valid_patience),
-        tf.keras.callbacks.ReduceLROnPlateau(
-            monitor=patience_metric, factor=0.5, patience=round(valid_patience*0.5), 
-            min_lr=5E-6, verbose=1)
+        
     ]
+    if learning_rate_schedule is 'constant':
+        pass
+    elif learning_rate_schedule is 'decrease':
+        callbacks.append(tf.keras.callbacks.ReduceLROnPlateau(
+            monitor=patience_metric, factor=0.5, 
+            patience=round(valid_patience*0.6), 
+            min_lr=5E-6, verbose=1))
+    else:
+        callbacks.append(learning_rate_schedule)
+
     try:
         history = model.fit(
             dataset, validation_data=valid_dataset,
@@ -236,7 +265,7 @@ def fine_tune_model(
         callbacks = [
             tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
             tf.keras.callbacks.ReduceLROnPlateau(
-                monitor='val_accuracy', factor=0.5, patience=round(valid_patience*0.5), 
+                monitor='val_accuracy', factor=0.5, patience=round(valid_patience*0.6), 
                 min_lr=5E-6, verbose=1)
         ]
     else:
@@ -284,17 +313,25 @@ def load_hypertuner(model, model_number, tuner_filepath, tuner_type='random'):
 
 def hypertune_model(
     model, dataset, valid_dataset, model_number, tuner_filepath, epochs, trials,  
-    tuner_type='random', valid_patience=None, epoch_length=None):
+    tuner_type='random', epoch_length=None, valid_patience=None, 
+    patience_metric='val_accuracy', learning_rate_schedule='decrease'):
 
     tuner_callbacks = [
-        tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
-        tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_accuracy', factor=0.5, patience=round(valid_patience*0.5), 
-            min_lr=5E-6, verbose=1)
+        tf.keras.callbacks.EarlyStopping(monitor=patience_metric, patience=valid_patience),  
     ]
+    if learning_rate_schedule is 'constant':
+        pass
+    elif learning_rate_schedule is 'decrease':
+        tuner_callbacks.append(tf.keras.callbacks.ReduceLROnPlateau(
+            monitor=patience_metric, factor=0.5, 
+            patience=round(valid_patience*0.6), 
+            min_lr=5E-6, verbose=1))
+    else:
+        tuner_callbacks.append(learning_rate_schedule)
+    
     if tuner_type == 'bayesian':
         tuner = kt.BayesianOptimization(model,
-            objective='val_accuracy',
+            objective=patience_metric,
             max_trials=trials,
             seed=2,
             directory=f'models/{model_number}',
@@ -302,7 +339,7 @@ def hypertune_model(
             overwrite=True)
     elif tuner_type == 'random':
         tuner = kt.RandomSearch(model,
-            objective='val_accuracy',
+            objective=patience_metric,
             max_trials=trials,
             seed=2,
             directory=f'models/{model_number}',
