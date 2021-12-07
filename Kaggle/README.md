@@ -40,44 +40,6 @@ Notes:
 - Forgot to write specifics before VGG
 - Hypertuners can be reloaded for more info on accuracy and hyperparameters
 
-<<<<<<< HEAD
-| # | Architecture  | Save # | Specifics                                                                         | LR   | L2   | Dropout | Augmented | Best acc. | Submitted |
-|---|---------------|--------|-----------------------------------------------------------------------------------|------|------|---------|-----------|-----------|-----------|
-| 1 | SVM	        | 1      | Baseline			                                                                 |      |      |         | No        | 0.18      | No        |
-| 2 | AlexNet       |        | Extreme overfitting                                                               |      |      |         | No        | ~0.4      | No        |
-| 3 | GoogLeNet     | 1      |                                                                                   |      |      |         | No        | 0.66      | Yes       |
-| 3 | GoogLeNet     | 2      | Added extra dropout                                                               |      |      |         | No        | 0.66      | Yes       |
-| 3 | GoogLeNet     | HT     | Tried different L2 (best: 0.0025) and extra inception layers (worse)              |      |      |         | No        | 0.59      | No        |
-| 3 | GoogLeNet     | 3      | Augmented data and batch normalization, then fine-tuning. 220 epochs              | 1E-4 | 2.5E-3 | 0.75  | Yes       | 0.71      | No        |
-| 4 | Custom Resnet |        | Tried different types of regularization, always overfit                           |      |      |         | Yes       | ~0.5      | No        |
-| 5 | ResNet        |        | Created from existing architecture, fast learning                                 |      |      |         | No        | ~0.5      | No        |
-| 6 | VGG           | 0      | 60 epochs                                                                         | 1E-3 | 0    | No      | Yes       | 0.5       | No        |
-| 6 | VGG           | 1      | 150 epochs                                                                        | 1E-3 | 0    | 0.3     | Yes       | 0.65      | No        |
-| 6 | VGG           | 2      | Continue training from save 1 with learn_rate=0.0001                              | 1E-4 | 0    | 0.3     | Yes       | 0.69      | Yes       |
-| 6 | VGG           | HT     | Hypertuning with different levels of dropout and L2                               | 1E-3 | -    | -       | Yes       | 0.65      | No        |
-| 6 | VGG           | 3      | Continue training 2nd best HT model                                               | 1E-4 | 1E-5 | 0.5     | Yes       | 0.73      | No        |
-| 6 | VGG           | 4      | 150 epochs                                                                        | 1E-3 | 1E-4 | 0.4     | Yes       | 0.68      | No        |
-| 6 | VGG           | 5      | Fine tune save 3 with 5 epochs of normal data                                     | 1E-5 | 1E-5 | 0.5     | No        | 0.76      | No        |
-| 6 | VGG           | 6      | Fine tune save 2 with 5 epochs of normal data                                     | 1E-4 | 1E-5 | 0.5     | No        | 0.80      | Yes       |
-| 7 | DeeperVGG     | 1      | 150 epochs                                                                        | 1E-3 | 1E-5 | 0.3     | Yes       | 0.67      | No        |
-| 7 | DeeperVGG     | 2      | Fine tune save 0 with 5 epochs of normal data                                     | 1E-4 | 1E-5 | 0.3     | No        | 0.77      | Yes       |
-| 7 | DeeperVGG     | 3      | Tried SpatialDropout                                                              | 1E-3 | 1E-4 | 0.3     | Yes       | 0.65      | No        |
-| 7 | DeeperVGG     | 4      | Fine-tuned save 3 with augmented and normal data                                  | 1E-4 | 1E-4 | 0.3     | Yes       | 0.79      | Yes       |
-| 7 | DeeperVGG     | 5      | Tried minor changes and final layer of 64 + fine-tuning                           | 1E-4 | 1E-4 | 0.3     | Yes       | 0.78      | No        |
-| 7 | DeeperVGG     | HT     | Add new 1024-deep layer + more batch norm + extra dropout + conv L2               | 5E-4 | -    | -       | Yes       | 0.78      | No        |
-| 7 | DeeperVGG     | 6      | Fine tune best HT model with non-augmented data                                   | 1E-4 | 1E-3 | 0.4     | Yes       | 0.84      | No        |
-| 7 | DeeperVGG     | 7      | Train save 6 for 4 epochs with validation data                                    | 1E-4 | 1E-3 | 0.4     | No        | ~0.85     | No        |
-| 8 | VGG Res       | HT     | Hypertuning learning rate, dropout and L2                                         | 1E-3 | -    | -       | Yes       | 0.65      | No        |
-| 8 | VGG Res       | 1      | 150 epochs + learning rate decrease + fine-tuning                                 | 1E-3 | 1E-3 | 0.5     | Yes       | 0.76      | No        |
-| 8 | VGG Res       | 2      | 150 epochs + learning rate decrease                                               | 5E-4 | 1E-4 | 0.6     | Yes       | 0.70      | No        |
-| 8 | VGG Res       | 3      | Fine-tuning on save 2                                                             | 5E-4 | 1E-4 | 0.56    | No        | 0.79      | No        |
-| 9 | DeeperVGG2    | 1      | Tried 50% deeper initial layers 220 epochs + learning rate decrease               | 5E-4 | 1E-2 | 0.4     | Yes       | 0.79      | No        |
-| 9 | DeeperVGG2    | 2      | Fine-tuning on save 2                                                             | 1E-4 | 1E-2 | 0.4     | No        | 0.84      | No        |
-| 9 | DeeperVGG2    | 3      | Train save 2 for 4 epochs with validation data                                    | 1E-4 | 1E-2 | 0.4     | No        | ~0.85     | No        |
-| X | Stacking test | 1      | Stacked best VGG, 2 good DeeperVGGs and VGG Res. Overfit to valid set by 1%       | -    | -    | -       | No        | 0.85      | Yes       |
-| X | Stacking test | 2      | Added DeeperVGG2_2                                                                | -    | -    | -       | No        | 0.86      | Yes       |
-| X | Stacking test | 3      | Try stacking DVGG_7 and DVGG2_3 (train + valid). Improved performance 0.5%        | -    | -    | -       | No        | 0.87      | Yes       |
-=======
 | #  | Architecture  | Save # | Specifics                                                                         | LR   | L2   | Dropout | Augmented | Best acc. | Submitted |
 |----|---------------|--------|-----------------------------------------------------------------------------------|------|------|---------|-----------|-----------|-----------|
 | 2  | AlexNet       |        | Extreme overfitting                                                               |      |      |         | No        | ~0.4      | No        |
@@ -111,13 +73,30 @@ Notes:
 | 9  | DeeperVGG2    | 2      | Fine-tuning on save 2                                                             | 1E-4 | 1E-2 | 0.4     | No        | 0.84      | No        |
 | 9  | DeeperVGG2    | 3      | Train save 2 for 4 epochs with validation data                                    | 1E-4 | 1E-2 | 0.4     | No        | ~0.85     | No        |
 | 10 | WideResNet    | 0      | First WideResNet, train for 50 epochs (9 hours!), wildly variable performance     | 1E-3 | 1E-4 | 0.4     | Yes       | ~0.60     | No        |
-| X  | Stacking test | 1      | Stacked best VGG, 2 good DeeperVGGs and VGG Res. Overfit to valid set by 1%       | -    | -    | -       | No        | 0.85      | Yes       |
-| X  | Stacking test | 2      | Added DeeperVGG2_2                                                                | -    | -    | -       | No        | 0.86      | Yes       |
-| X  | Stacking test | 3      | Try stacking DVGG_7 and DVGG2_3 (train + valid). Improved performance 0.5%        | -    | -    | -       | No        | 0.87      | Yes       |
->>>>>>> cd0abec017e07fb1ffb93fc4b02b536ab6a4a3f6
+| 10 | WideResNet    | 1      | Shrink WideResNet to n=2, k=10-12, with low regularization                        | 5E-4 | 1E-4 | 0.3     | Yes       | 0.67      | No        |
+| 10 | WideResNet    | 2      | Train model with n=2, k=8                                                         | 5E-4 | 1E-4 | 0.4     | Yes       | 0.73      | No        |
+| 10 | WideResNet    | 3      | Fine tune save 2 with non-augmented data                                          | 1E-5 | 1E-4 | 0.4     | No        | 0.80      | No        |
+| 10 | WideResNet    | HT1    | Train 2 models with k=8, n=1 and drop=0.6 and n=2 and drop=0.3 (best)             | 5E-4 | 1E-5 | -       | Yes       | 0.77      | No        |
+| 10 | WideResNet    | 4      | Fine tune best model from HT1 with non-augmented data                             | 1E-5 | 1E-4 | 0.3     | No        | 0.81      | No        |
+| 10 | WideResNet    | HT2    | Train 3 models with n=2, dropout 0.3 or 0.5 and k=6 or 9 (best 0.5 and 9)         | 5E-4 | 1E-4 | -       | Yes       | 0.80      | No        |
+| 10 | WideResNet    | 5      | Fine tune best model from HT2 with non-augmented data                             | 1E-5 | 1E-4 | 0.4     | No        | 0.84      | No        |
+| 10 | WideResNet    | 6      | Try n=2, k=12, SpatialDropout2D and higher L2                                     | 5E-4 | 2E-4 | 0.5     | Yes       | 0.71      | No        |
+| 10 | WideResNet    | HT3    | Deeper with n=3 and k=12. Tried different L2/dropout. Underfit and overfit        | 1E-4 | -    | -       | Yes       | 0.79      | No        |
+| 10 | WideResNet    | HT3    | Deeper with n=3 and k=12. Tried different L2/dropout. Underfit and overfit        | 1E-4 | -    | -       | Yes       | 0.79      | No        |
+| 10 | WideResNet    | 8      | Fine tuned best model from HT3 (l2=0.001, drop=0.5)                               | 1E-5 | 1E-3 | 0.5     | No        | 0.84      | No        |
+| 11 | Stacking      | HT     | Try different dropouts and L2 regs for stacking. Overfit (lost 1.5% on test data) | 5E-5 | -    | -       | No        | 0.86      | Yes       |
+| 11 | Stacking      | 0      | Try 2 Dense layers, 512 then 256.                                                 | 1E-5 | 1E-4 | 0.3     | No        | 0.86      | No        |
+| X  | Basic stack   | 1      | Stacked best VGG, 2 good DeeperVGGs and VGG Res. Overfit to valid set by 1%       | -    | -    | -       | No        | 0.85      | Yes       |
+| X  | Basic stack   | 2      | Added DeeperVGG2_2                                                                | -    | -    | -       | No        | 0.86      | Yes       |
+| X  | Basic stack   | 3      | Try stacking DVGG_7 and DVGG2_3 (train + valid). Improved performance 0.5%        | -    | -    | -       | No        | 0.87      | Yes       |
+| X  | Basic stack   | 4      | Added WideResNet_4 to list from Basic stack 2.                                    | -    | -    | -       | No        | 0.86      | Yes       |
+| X  | Basic stack   | 5      | Added WideResNet_5 to list from Basic stack 4.                                    | -    | -    | -       | No        | 0.87      | Yes       |
+| X  | Basic stack   | 6      | Tweak prob and accuracy rating to 1 and 13                                        | -    | -    | -       | No        | 0.87      | Yes       |
+| X  | Basic stack   | 7      | Add WideResNet_8 and use 1 and 7 prob/accuracy                                    | -    | -    | -       | No        | 0.87      | Yes       |
+| X  | Basic stack   | 8      | Repeat save 7 with prob/accuracy of 4 and 8. Worse results! (avoid prob>1)        | -    | -    | -       | No        | 0.86      | Yes       |
 
-Stacking test:
-- Altered data to give more weight to models with higher accuracy and confidence
+Basic stacking :
+- Altered data to give more weight to models with higher accuracy and confidence. Adjustable accuracy/probability weightings
 
 ### Notes
 

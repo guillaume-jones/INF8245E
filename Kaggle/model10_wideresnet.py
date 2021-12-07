@@ -3,9 +3,11 @@ import tensorflow.keras.layers as layers
 import tensorflow.keras.regularizers as reg
 import keras_tuner as kt
 
-# Epochs for training : 150+
-# Good validation patience : ?
+# Epochs for training : 150+ (250-300 minutes)
+# Good validation patience : 15-20
 # Good fine-tuning lr : ?
+
+model_number = 'model10'
 
 class Model(kt.HyperModel):
     def residual_module(self, input, filters, stride=1, l2_reg=0, dropout=0.3):
@@ -18,7 +20,7 @@ class Model(kt.HyperModel):
             filters, kernel_size=(3,3), strides=(stride, stride),
             padding='same', kernel_initializer='he_normal',
             kernel_regularizer=reg.l2(l2_reg), use_bias=False)(relu_1)
-        dropout = layers.Dropout(dropout)(conv_1)
+        dropout = layers.SpatialDropout2D(dropout)(conv_1)
         bn_2 = layers.BatchNormalization()(dropout)
         relu_2 = layers.ReLU()(bn_2)
         conv_2 = layers.Conv2D(
@@ -32,7 +34,7 @@ class Model(kt.HyperModel):
                 filters, kernel_size=(3,3), strides=(stride,stride),
                 padding='same', kernel_initializer='he_normal',
                 kernel_regularizer=reg.l2(l2_reg), use_bias=False)(relu_1)
-        # If a convolution is not needed, no batch/activation are used for the shortcut
+        # If a convolution is not needed, no convolution is used for the shortcut
         else:
             shortcut = input
 
@@ -57,17 +59,17 @@ class Model(kt.HyperModel):
     def build(self, hyperparameters):
         # Tunable hyperparameters
         if hyperparameters is not None:
-            conv_dropout = hyperparameters.Float('spatial_dropout', 0.0, 0.6, step=0.2)
-            l2_reg = hyperparameters.Float('dense_l2_reg', 0.0001, 0.01, sampling='log')
-            k = hyperparameters.Int('k', 2, 10, step=2)
-            n = hyperparameters.Int('n', 1, 4)
+            #l2_reg = hyperparameters.Float('l2_reg', 0.0001, 0.01, sampling='log')
+            k = hyperparameters.Int('k', 10, 12, step=2)
+            n = hyperparameters.Int('n', 2, 3, step=1)
+            conv_dropout = hyperparameters.Float('conv_dropout', 0.4, 0.6, step=0.2)
         else:
-            conv_dropout = 0.3
-            l2_reg = 0.00001
             k=12
-            n=1
+            n=2
+            conv_dropout = 0.5
 
         # Fixed hyperparameters
+        l2_reg = 0.0002
         dense_dropout = conv_dropout
         learning_rate = 0.0005
 
@@ -77,9 +79,9 @@ class Model(kt.HyperModel):
         output = self.conv_layer(input_layer, 16, 2, l2_reg=l2_reg)
 
         # WideResNet, conv group 2
-        output = self.residual_module(output, 16 * k, 2, l2_reg=l2_reg, dropout=conv_dropout/4)
+        output = self.residual_module(output, 16 * k, 2, l2_reg=l2_reg, dropout=conv_dropout/3)
         for i in range(n - 1):
-            output = self.residual_module(output, 16 * k, l2_reg=l2_reg, dropout=conv_dropout/4)
+            output = self.residual_module(output, 16 * k, l2_reg=l2_reg, dropout=conv_dropout/3)
 
         # WideResNet, conv group 3
         output = self.residual_module(output, 32 * k, 2, l2_reg=l2_reg, dropout=conv_dropout/2)

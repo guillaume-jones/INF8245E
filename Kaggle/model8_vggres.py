@@ -7,6 +7,8 @@ import keras_tuner as kt
 # Good validation patience : 30
 # Good fine-tuning lr : 1E-5
 
+model_number = 'model8'
+
 class Model(kt.HyperModel):
     def residual_module(self, input, filters, stride=1, bottleneck=0, l2_reg=0, batch_norm=0.99):
         # Applies bottleneck if necessary, to reduce dimensions

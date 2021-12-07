@@ -27,7 +27,7 @@ def load_test_set():
     """
     return open_pickled_file('data/x_test.pkl') / 255.0
 
-def load_train_set(resnet=False):
+def load_train_set():
     """
     Open Kaggle competition image dataset
     Scale images to floats and replace labels with class numbers
@@ -37,16 +37,11 @@ def load_train_set(resnet=False):
     x_train = open_pickled_file('data/x_train.pkl') / 255.0
 
     # Add extra dimension to images for "channels"
-    if resnet:
-        x_train = np.stack([x_train, x_train, x_train], axis=3)
-        x_train = tf.keras.applications.resnet_v2.preprocess_input(x_train)
-    else:
-        x_train = np.reshape(x_train, (-1, 96, 96, 1))
+    x_train = np.reshape(x_train, (-1, 96, 96, 1))
     
 
     # Open y_train and convert to numbers
     y_train_raw = open_pickled_file('data/y_train.pkl')
-
 
     # Convert word labels to numbers
     y_dictionary = get_label_dictionary()
@@ -57,28 +52,46 @@ def load_train_set(resnet=False):
     # Add extra dimension to images for conversion to dataset
     y_train = np.reshape(y_train, (-1, 1))
 
+    # Split out a validation set
     x_train_partial, x_valid, y_train_partial, y_valid = train_test_split(
         x_train, y_train, test_size=0.2, random_state=1)
 
     return x_train, y_train, x_train_partial, y_train_partial, x_valid, y_valid
     
-def load_train_as_dataset(return_complete_set=False, resnet=False):
+def load_train_as_dataset(return_complete_set=False):
     """
     Convert numpy or other dataset to TensorFlow Dataset
     Batch using batch_size
     """
-    x_train, y_train, x_train_partial, y_train_partial, x_valid, y_valid = load_train_set(resnet)
+    x_complete, y_complete, x_train, y_train, x_valid, y_valid = load_train_set()
     
-    train_dataset = tf.data.Dataset.from_tensor_slices((x_train_partial, y_train_partial))
-    valid_dataset = tf.data.Dataset.from_tensor_slices((x_valid, y_valid))
+    train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+    valid_dataset = tf.data.Dataset.from_tensor_slices((x_valid, y_valid)).batch(128).cache()
 
     if return_complete_set:
-        complete_train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+        complete_train_dataset = tf.data.Dataset.from_tensor_slices((x_complete, y_complete))
         return complete_train_dataset, train_dataset, valid_dataset, y_valid
     
     return train_dataset, valid_dataset, y_valid
 
-def augment_dataset(dataset, batch_size):
+def load_train_as_dataset_autoencoder():
+    _, _, x_train, y_train, x_valid, y_valid = load_train_set()
+
+    x_train_classes = []
+    x_valid_classes = []
+    for i in range(11):
+        x_train_classes.append(x_train[y_train.flatten() == i])
+        x_valid_classes.append(x_valid[y_valid.flatten() == i])
+
+    train_datasets = [tf.data.Dataset.from_tensor_slices((x_train, x_train)) for x_train in x_train_classes]
+
+    valid_datasets = [tf.data.Dataset.from_tensor_slices((x_valid, x_valid)).batch(128).cache() 
+        for x_valid in x_valid_classes]
+
+    return train_datasets, valid_datasets
+
+
+def augment_dataset(dataset, batch_size, autoencoder=False):
     """
     Augment images from training set with standard augmentations
     Also repeat and shuffle data for good training
@@ -92,7 +105,7 @@ def augment_dataset(dataset, batch_size):
 
     augmentation = tf.keras.Sequential()
     augmentation.add(layers.RandomFlip(mode='horizontal'))
-    augmentation.add(layers.RandomRotation(0.1))
+    augmentation.add(layers.RandomRotation(0.07))
     augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
     # augmentation.add(layers.RandomZoom(.05, .05)) # Breaks certain models completely (0 learning)
     augmentation.add(layers.RandomContrast(0.7))
@@ -100,6 +113,11 @@ def augment_dataset(dataset, batch_size):
     dataset = dataset.map(
         lambda image, y: (augmentation(image, training=True), y),
         num_parallel_calls=tf.data.AUTOTUNE)
+
+    if autoencoder:
+        dataset = dataset.map(
+            lambda image, _: (image, image),
+            num_parallel_calls=tf.data.AUTOTUNE)
 
     return dataset.prefetch(buffer_size=tf.data.AUTOTUNE), epoch_length
 
@@ -112,6 +130,26 @@ def show_images(dataset, count):
             plt.title(labels[i].numpy()[0])
             plt.axis("off")
         plt.show()
+
+def show_reconstructions(dataset, count, model):
+    reconstructed = model.predict(dataset.take(1))
+
+    plt.figure(figsize=(10, 10))
+    for images, _ in dataset.take(1):
+        for i in range(count):
+            ax = plt.subplot(3, 3, i + 1)
+            plt.imshow(images[i].numpy().squeeze(), cmap=plt.cm.gray)
+            plt.axis("off")
+        plt.show()
+    plt.show()
+
+    plt.figure(figsize=(10, 10))
+    for i, reconstructed in enumerate(reconstructed[:count]):
+        ax = plt.subplot(3, 3, i + 1)
+        plt.imshow(reconstructed.squeeze(), cmap=plt.cm.gray)
+        plt.axis("off")
+    plt.show()
+
 
 def print_accuracy(y_true, y_pred):
     """
@@ -154,22 +192,53 @@ def plot_confusion_matrix(y_true, y_pred):
     confusion_matrix_display.figure_.set_size_inches(10, 10)
     plt.show()
 
+class CycleScheduler:
+    def __init__(self, peak_lr, mid_epoch):
+        self.peak_lr = peak_lr
+        self.mid_epoch = mid_epoch
+    
+    def scheduler(self, epoch, lr):
+        # Initial ramp-up
+        if epoch <= self.mid_epoch:
+            return epoch * (self.peak_lr*0.8 / self.mid_epoch) + self.peak_lr * 0.2
+        # Terminal low learning rate
+        elif epoch > self.mid_epoch * 2:
+            return self.peak_lr * 0.2
+        # Ramp-down
+        else:
 
-def train_model(model, dataset, valid_dataset, epochs, valid_patience, epoch_length=None):
+            return epoch * -(self.peak_lr*0.8 / self.mid_epoch) + self.peak_lr * 1.8
+    
+    def callback(self):
+        return self.scheduler
+
+
+def train_model(
+    model, dataset, valid_dataset, epochs, epoch_length=None, 
+    valid_patience=0, patience_metric='val_accuracy', 
+    learning_rate_schedule='decrease'):
     """
     Trains models from scratch
     """
     callbacks = [
-        tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),
-        tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_accuracy', factor=0.5, patience=int(valid_patience*0.4), 
-            min_lr=5E-6, verbose=1)
+        tf.keras.callbacks.EarlyStopping(monitor=patience_metric, patience=valid_patience),
+        
     ]
+    if learning_rate_schedule == 'constant':
+        pass
+    elif learning_rate_schedule == 'decrease':
+        callbacks.append(tf.keras.callbacks.ReduceLROnPlateau(
+            monitor=patience_metric, factor=0.5, 
+            patience=round(valid_patience*0.6), 
+            min_lr=5E-6, verbose=1))
+    else:
+        callbacks.append(learning_rate_schedule)
+
     try:
         history = model.fit(
-            dataset, validation_data=valid_dataset.batch(128).cache(),
+            dataset, validation_data=valid_dataset,
             epochs=epochs, steps_per_epoch=epoch_length, 
-            callbacks=callbacks, verbose=1)
+            callbacks=callbacks, verbose=2)
     except KeyboardInterrupt:
         print('Training interrupted')
         return model, None
@@ -183,30 +252,35 @@ def fine_tune_model(
     Fine-tune existing models. Uses epoch_length if using an infinite dataset (like augmented), otherwise set to None
     """
     if learning_rate is not None:
-        model.compile(
+        fine_model = tf.keras.models.clone_model(model)
+        fine_model.compile(
             optimizer=tf.keras.optimizers.Nadam(learning_rate),
             loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
             metrics=['accuracy'])
+        fine_model.set_weights(model.get_weights())
+    else:
+        fine_model = model
 
     if valid_patience is not None:
         callbacks = [
             tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
             tf.keras.callbacks.ReduceLROnPlateau(
-                monitor='val_accuracy', factor=0.5, patience=int(valid_patience*0.4), 
+                monitor='val_accuracy', factor=0.5, patience=round(valid_patience*0.6), 
                 min_lr=5E-6, verbose=1)
         ]
     else:
         callbacks=[]
+
     try:
-        history = model.fit(
-            dataset, validation_data=valid_dataset.batch(128).cache(),
+        history = fine_model.fit(
+            dataset, validation_data=valid_dataset,
             epochs=epochs, steps_per_epoch=epoch_length, 
             callbacks=callbacks, verbose=1)
     except KeyboardInterrupt:
         print('Fine-tuning interrupted.')
-        return model, None
+        return fine_model, None
 
-    return model, history
+    return fine_model, history
 
 def fine_tune_model_filepath(
     model_filepath, dataset, valid_dataset, epochs, 
@@ -239,27 +313,35 @@ def load_hypertuner(model, model_number, tuner_filepath, tuner_type='random'):
 
 def hypertune_model(
     model, dataset, valid_dataset, model_number, tuner_filepath, epochs, trials,  
-    tuner_type='random', valid_patience=None, epoch_length=None):
+    tuner_type='random', epoch_length=None, valid_patience=None, 
+    patience_metric='val_accuracy', learning_rate_schedule='decrease'):
 
     tuner_callbacks = [
-        tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=valid_patience),  
-        tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_accuracy', factor=0.5, patience=int(valid_patience*0.4), 
-            min_lr=5E-6, verbose=1)
+        tf.keras.callbacks.EarlyStopping(monitor=patience_metric, patience=valid_patience),  
     ]
+    if learning_rate_schedule == 'constant':
+        pass
+    elif learning_rate_schedule == 'decrease':
+        tuner_callbacks.append(tf.keras.callbacks.ReduceLROnPlateau(
+            monitor=patience_metric, factor=0.5, 
+            patience=round(valid_patience*0.6), 
+            min_lr=5E-6, verbose=1))
+    else:
+        tuner_callbacks.append(learning_rate_schedule)
+    
     if tuner_type == 'bayesian':
         tuner = kt.BayesianOptimization(model,
-            objective='val_accuracy',
+            objective=patience_metric,
             max_trials=trials,
-            seed=1,
+            seed=2,
             directory=f'models/{model_number}',
             project_name=tuner_filepath,
             overwrite=True)
     elif tuner_type == 'random':
         tuner = kt.RandomSearch(model,
-            objective='val_accuracy',
+            objective=patience_metric,
             max_trials=trials,
-            seed=1,
+            seed=2,
             directory=f'models/{model_number}',
             project_name=tuner_filepath,
             overwrite=True)
@@ -268,7 +350,7 @@ def hypertune_model(
     try:
         tuner.search(
             dataset, 
-            validation_data=valid_dataset.batch(128).cache(),
+            validation_data=valid_dataset,
             epochs=epochs, steps_per_epoch=epoch_length,
             callbacks=tuner_callbacks, verbose=1)
     except KeyboardInterrupt:
