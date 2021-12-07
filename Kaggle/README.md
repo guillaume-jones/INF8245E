@@ -95,8 +95,8 @@ Notes:
 | X  | Basic stack   | 7      | Add WideResNet_8 and use 1 and 7 prob/accuracy                                    | -    | -    | -       | No        | 0.87      | Yes       |
 | X  | Basic stack   | 8      | Repeat save 7 with prob/accuracy of 4 and 8. Worse results! (avoid prob>1)        | -    | -    | -       | No        | 0.86      | Yes       |
 
-Basic stack:
-- Altered data to give more weight to models with higher accuracy and confidence
+Basic stacking :
+- Altered data to give more weight to models with higher accuracy and confidence. Adjustable accuracy/probability weightings
 
 ### Notes
 
@@ -136,6 +136,10 @@ Wide ResNet
 Vision Transformer
 - Transformers apparently need a lot of data (consider strong data augmentation)
 - [Keras example](https://keras.io/examples/vision/image_classification_with_vision_transformer/)
+
+Swin Transformer
+-Apparently needs a lot of data like the vision transformer
+-[Keras example](https://keras.io/examples/vision/swin_transformers/)
 
 Dataset is called Animals-10
 - Very little info/usage
