@@ -7,6 +7,8 @@ import keras_tuner as kt
 # Good validation patience : 25
 # Good fine-tuning lr : 1E-5
 
+model_number = 'model9'
+
 class Model(kt.HyperModel):
     def conv_layer(self, input, filters, stride=1, kernel=3, l2_reg=0.0001, padding='same'):
         return layers.Conv2D(

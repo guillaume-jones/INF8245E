@@ -7,6 +7,8 @@ import keras_tuner as kt
 # Good validation patience : 15-20
 # Good fine-tuning lr : ?
 
+model_number = 'model10'
+
 class Model(kt.HyperModel):
     def residual_module(self, input, filters, stride=1, l2_reg=0, dropout=0.3):
         # Applies batch norm and relu to BOTH convolutions and shortcut

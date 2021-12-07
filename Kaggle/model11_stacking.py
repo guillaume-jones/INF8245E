@@ -8,6 +8,8 @@ import keras_tuner as kt
 # Good validation patience : 2-4
 # Good fine-tuning lr : 
 
+model_number = 'model11'
+
 class Model(kt.HyperModel):
     def load_base_model(self, inputs, model_filepath):
         base_model = models.load_model(model_filepath)

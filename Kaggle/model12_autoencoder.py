@@ -8,6 +8,8 @@ import keras_tuner as kt
 # Good validation patience : 2-4
 # Good fine-tuning lr : 
 
+model_number = 'model12'
+
 class Model(kt.HyperModel):
     def load_base_model(self, inputs, model_filepath):
         base_model = models.load_model(model_filepath)
@@ -20,7 +22,7 @@ class Model(kt.HyperModel):
         autoencoders = []
         for i in range(11):
             base_autoencoder = self.load_base_model(
-                inputs, f'models/model12/{model_name}/{i}')
+                inputs, f'models/{model_number}/{model_name}/{i}')
             autoencoders.append(self.difference_layer(inputs, base_autoencoder))
         return autoencoders
 
