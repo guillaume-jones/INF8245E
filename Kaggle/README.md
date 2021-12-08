@@ -86,6 +86,8 @@ Notes:
 | 10 | WideResNet    | 8      | Fine tuned best model from HT3 (l2=0.001, drop=0.5)                               | 1E-5 | 1E-3 | 0.5     | No        | 0.84      | No        |
 | 11 | Stacking      | HT     | Try different dropouts and L2 regs for stacking. Overfit (lost 1.5% on test data) | 5E-5 | -    | -       | No        | 0.86      | Yes       |
 | 11 | Stacking      | 0      | Try 2 Dense layers, 512 then 256.                                                 | 1E-5 | 1E-4 | 0.3     | No        | 0.86      | No        |
+| 11 | Stacking      | 1      | Add SimpleNets, 3x256 layers                                                      | 1E-4 | 1E-1 | 0       | No        | 0.89      | No        |
+| 11 | Stacking      | 2      | Add more SimpleNets                                                               | 1E-4 | 1E-1 | 0       | No        | 0.89      | Yes       |
 | X  | Basic stack   | 1      | Stacked best VGG, 2 good DeeperVGGs and VGG Res. Overfit to valid set by 1%       | -    | -    | -       | No        | 0.85      | Yes       |
 | X  | Basic stack   | 2      | Added DeeperVGG2_2                                                                | -    | -    | -       | No        | 0.86      | Yes       |
 | X  | Basic stack   | 3      | Try stacking DVGG_7 and DVGG2_3 (train + valid). Improved performance 0.5%        | -    | -    | -       | No        | 0.87      | Yes       |
@@ -94,6 +96,7 @@ Notes:
 | X  | Basic stack   | 6      | Tweak prob and accuracy rating to 1 and 13                                        | -    | -    | -       | No        | 0.87      | Yes       |
 | X  | Basic stack   | 7      | Add WideResNet_8 and use 1 and 7 prob/accuracy                                    | -    | -    | -       | No        | 0.87      | Yes       |
 | X  | Basic stack   | 8      | Repeat save 7 with prob/accuracy of 4 and 8. Worse results! (avoid prob>1)        | -    | -    | -       | No        | 0.86      | Yes       |
+| X  | Basic stack   | 9      | Add SimpleNet models to basic stack. High acc works best                          | -    | -    | -       | No        | 0.90      | Yes       |
 
 Basic stacking :
 - Altered data to give more weight to models with higher accuracy and confidence. Adjustable accuracy/probability weightings
