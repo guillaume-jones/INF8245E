@@ -25,7 +25,9 @@ def load_test_set():
     Open Kaggle competition image dataset
     Scale images to floats and replace labels with class numbers
     """
-    return open_pickled_file('data/x_test.pkl') / 255.0
+    x_test = open_pickled_file('data/x_test.pkl') / 255.0
+
+    return tf.data.Dataset.from_tensor_slices((x_test)).batch(128).cache()
 
 def load_train_set():
     """
@@ -73,22 +75,6 @@ def load_train_as_dataset(return_complete_set=False):
         return complete_train_dataset, train_dataset, valid_dataset, y_valid
     
     return train_dataset, valid_dataset, y_valid
-
-def load_train_as_dataset_autoencoder():
-    _, _, x_train, y_train, x_valid, y_valid = load_train_set()
-
-    x_train_classes = []
-    x_valid_classes = []
-    for i in range(11):
-        x_train_classes.append(x_train[y_train.flatten() == i])
-        x_valid_classes.append(x_valid[y_valid.flatten() == i])
-
-    train_datasets = [tf.data.Dataset.from_tensor_slices((x_train, x_train)) for x_train in x_train_classes]
-
-    valid_datasets = [tf.data.Dataset.from_tensor_slices((x_valid, x_valid)).batch(128).cache() 
-        for x_valid in x_valid_classes]
-
-    return train_datasets, valid_datasets
 
 
 def augment_dataset(dataset, batch_size, autoencoder=False):
@@ -238,7 +224,7 @@ def train_model(
         history = model.fit(
             dataset, validation_data=valid_dataset,
             epochs=epochs, steps_per_epoch=epoch_length, 
-            callbacks=callbacks, verbose=2)
+            callbacks=callbacks, verbose=1)
     except KeyboardInterrupt:
         print('Training interrupted')
         return model, None

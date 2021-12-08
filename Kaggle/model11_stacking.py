@@ -16,27 +16,27 @@ class Model(kt.HyperModel):
         base_model._name = model_filepath
         base_model.trainable = False
 
-        return base_model(inputs, training=False)
+        return layers.Softmax()(base_model(inputs, training=False))
 
-    def dense_layer(self, inputs, size, l2_reg=0, dropout=0, activation='elu'):
-        output = layers.Dropout(dropout)(inputs)
+    def dense_layer(self, inputs, size, l2_reg=0, dropout=0, activation='relu'):
+        bn = layers.BatchNormalization()(inputs)
+        dropout = layers.Dropout(dropout)(bn)
         return layers.Dense(
             size, activation=activation,
             kernel_regularizer=reg.l2(l2_reg), 
-            bias_regularizer=reg.l2(l2_reg))(output)
+            bias_regularizer=reg.l2(l2_reg))(dropout)
 
     def build(self, hyperparameters):
         # Tunable hyperparameters
         if hyperparameters is not None:
-            dropout = hyperparameters.Float('dropout', 0.3, 0.6, step=0.3)
-            l2_reg = hyperparameters.Choice('l2_reg', [0.0001, 0.001])
+            dropout = hyperparameters.Float('dropout', 0.2, 0.4, step=0.1)
 
         else:
-            dropout = 0.3
-            l2_reg = 0.0001
+            dropout = 0.4
 
         # Fixed hyperparameters
-        learning_rate = 0.00001
+        l2_reg = 0.00001
+        learning_rate = 0.0001
         base_model_filepaths = [
             'model6/VGG_6_79',
             'model7/DeeperVGG_4_79',
@@ -60,13 +60,14 @@ class Model(kt.HyperModel):
         output = layers.concatenate(base_models)
         output = self.dense_layer(output, 256, l2_reg, dropout)
         output = self.dense_layer(output, 256, l2_reg, dropout)
+        output = self.dense_layer(output, 256, l2_reg, dropout)
         output = self.dense_layer(output, 11, l2_reg, dropout, activation=None)
 
         model = keras.models.Model(inputs=input_layer, outputs=output, name='stacked_model')
 
         # Create model
         model.compile(
-            optimizer=keras.optimizers.Adam(learning_rate),
+            optimizer=keras.optimizers.Nadam(learning_rate),
             loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
             metrics=['accuracy'])
 
