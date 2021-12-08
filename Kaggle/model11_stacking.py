@@ -33,9 +33,12 @@ def generate_predictions_for_datasets(datasets, test_index=2):
         'model8/VGGRes_3_79',
         'model9/DeeperVGG2_2_84',
         'model10/WideResNet_3_80',
+        'model10/WideResNet_4_81',
         'model10/WideResNet_5_84',
         'model10/WideResNet_8_83',
+        'model14/SimpleNet_4_86',
         'model14/SimpleNet_5_87',
+        'model14/SimpleNet_6_87',
         'model14/SimpleNet_8_89',
         'model14/SimpleNet_10_88'
     ]
@@ -75,27 +78,23 @@ class Model(kt.HyperModel):
     def build(self, hyperparameters):
         # Tunable hyperparameters
         if hyperparameters is not None:
-            l2_reg = hyperparameters.Float('l2_reg', 1E-5, 5E-1, sampling='log')
-            dropout = hyperparameters.Float('dropout', 0, 0.4)
-            extra_layer = hyperparameters.Boolean('extra_layer')
+            l2_reg = hyperparameters.Float('l2_reg', 1E-5, 1, sampling='log')
+            dropout = hyperparameters.Float('dropout', 0, 0.5)
         else:
             l2_reg = 1E-1
             dropout = 0
-            extra_layer = False
 
         # Fixed hyperparameters
         learning_rate = 1E-4
 
         # Use already predicted data as input for stacking
         # Input should be num_models*11
-        input_layer = layers.Input(shape=(12*11))
+        input_layer = layers.Input(shape=(14*11))
 
         # Applies dense layers on top of concatenated models
         output = self.dense_layer(input_layer, 128, l2_reg, dropout)
         output = self.dense_layer(output, 128, l2_reg, dropout)
         output = self.dense_layer(output, 128, l2_reg, dropout)
-        if extra_layer:
-            output = self.dense_layer(output, 128, l2_reg, dropout)
         output = self.dense_layer(output, 11, l2_reg, dropout, activation=None)
 
         model = models.Model(inputs=input_layer, outputs=output, name='stacked_model')
