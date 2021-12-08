@@ -26,8 +26,9 @@ def load_test_set():
     Scale images to floats and replace labels with class numbers
     """
     x_test = open_pickled_file('data/x_test.pkl') / 255.0
+    x_test = np.reshape(x_test, (-1, 96, 96, 1))
 
-    return tf.data.Dataset.from_tensor_slices((x_test)).batch(128).cache()
+    return tf.data.Dataset.from_tensor_slices((x_test)).batch(128).prefetch(buffer_size=tf.data.AUTOTUNE)
 
 def load_train_set():
     """
@@ -67,25 +68,26 @@ def load_train_as_dataset(return_complete_set=False):
     """
     x_complete, y_complete, x_train, y_train, x_valid, y_valid = load_train_set()
     
-    train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-    valid_dataset = tf.data.Dataset.from_tensor_slices((x_valid, y_valid)).batch(128).cache()
+    train_dataset = tf.data.Dataset.from_tensor_slices(
+        (x_train, y_train)).batch(32).prefetch(buffer_size=tf.data.AUTOTUNE)
+    valid_dataset = tf.data.Dataset.from_tensor_slices(
+        (x_valid, y_valid)).batch(128).prefetch(buffer_size=tf.data.AUTOTUNE)
 
     if return_complete_set:
-        complete_train_dataset = tf.data.Dataset.from_tensor_slices((x_complete, y_complete))
+        complete_train_dataset = tf.data.Dataset.from_tensor_slices(
+            (x_complete, y_complete)).batch(32).prefetch(buffer_size=tf.data.AUTOTUNE)
         return complete_train_dataset, train_dataset, valid_dataset, y_valid
     
     return train_dataset, valid_dataset, y_valid
 
 
-def augment_dataset(dataset, batch_size, autoencoder=False):
+def augment_dataset(dataset, autoencoder=False):
     """
     Augment images from training set with standard augmentations
     Also repeat and shuffle data for good training
     """
-    epoch_length = math.ceil(len(dataset) / batch_size)
+    epoch_length = math.ceil(len(dataset) / 32)
     dataset = dataset.shuffle(len(dataset))
-
-    dataset = dataset.batch(batch_size)
 
     dataset = dataset.repeat()
 
