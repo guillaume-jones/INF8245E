@@ -36,8 +36,8 @@ def generate_predictions_for_datasets(datasets, test_index=2):
         'model10/WideResNet_5_84',
         'model10/WideResNet_8_83',
         'model14/SimpleNet_5_87',
-        'model14/SimpleNet_6_87',
-        'model14/SimpleNet_8_89'
+        'model14/SimpleNet_8_89',
+        'model14/SimpleNet_10_88'
     ]
     base_models = []
     for filepath in base_model_filepaths:
@@ -75,11 +75,13 @@ class Model(kt.HyperModel):
     def build(self, hyperparameters):
         # Tunable hyperparameters
         if hyperparameters is not None:
-            l2_reg = hyperparameters.Float('l2_reg', 1E-6, 1E-1, sampling='log')
-            dropout = hyperparameters.Float('dropout', 0.1, 0.6)
+            l2_reg = hyperparameters.Float('l2_reg', 1E-5, 5E-1, sampling='log')
+            dropout = hyperparameters.Float('dropout', 0, 0.4)
+            extra_layer = hyperparameters.Boolean('extra_layer')
         else:
-            l2_reg = 5E-1
+            l2_reg = 1E-1
             dropout = 0
+            extra_layer = False
 
         # Fixed hyperparameters
         learning_rate = 1E-4
@@ -89,9 +91,11 @@ class Model(kt.HyperModel):
         input_layer = layers.Input(shape=(12*11))
 
         # Applies dense layers on top of concatenated models
-        output = self.dense_layer(input_layer, 512, l2_reg, dropout)
-        output = self.dense_layer(output, 256, l2_reg, dropout)
+        output = self.dense_layer(input_layer, 128, l2_reg, dropout)
         output = self.dense_layer(output, 128, l2_reg, dropout)
+        output = self.dense_layer(output, 128, l2_reg, dropout)
+        if extra_layer:
+            output = self.dense_layer(output, 128, l2_reg, dropout)
         output = self.dense_layer(output, 11, l2_reg, dropout, activation=None)
 
         model = models.Model(inputs=input_layer, outputs=output, name='stacked_model')
