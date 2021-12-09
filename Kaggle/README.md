@@ -88,6 +88,7 @@ Notes:
 | 11 | Stacking      | 0      | Try 2 Dense layers, 512 then 256.                                                 | 1E-5 | 1E-4 | 0.3     | No        | 0.86      | No        |
 | 11 | Stacking      | 1      | Add SimpleNets, 3x256 layers                                                      | 1E-4 | 1E-1 | 0       | No        | 0.89      | No        |
 | 11 | Stacking      | 2      | Add more SimpleNets                                                               | 1E-4 | 1E-1 | 0       | No        | 0.89      | Yes       |
+| 14 | SimpleNet     | HT     | 7 trials with various L2, dropout, lr. Best Lr = 5E-4,                            | -    | -    | 0       | No        | 0.89      | Yes       |
 | X  | Basic stack   | 1      | Stacked best VGG, 2 good DeeperVGGs and VGG Res. Overfit to valid set by 1%       | -    | -    | -       | No        | 0.85      | Yes       |
 | X  | Basic stack   | 2      | Added DeeperVGG2_2                                                                | -    | -    | -       | No        | 0.86      | Yes       |
 | X  | Basic stack   | 3      | Try stacking DVGG_7 and DVGG2_3 (train + valid). Improved performance 0.5%        | -    | -    | -       | No        | 0.87      | Yes       |
@@ -96,7 +97,9 @@ Notes:
 | X  | Basic stack   | 6      | Tweak prob and accuracy rating to 1 and 13                                        | -    | -    | -       | No        | 0.87      | Yes       |
 | X  | Basic stack   | 7      | Add WideResNet_8 and use 1 and 7 prob/accuracy                                    | -    | -    | -       | No        | 0.87      | Yes       |
 | X  | Basic stack   | 8      | Repeat save 7 with prob/accuracy of 4 and 8. Worse results! (avoid prob>1)        | -    | -    | -       | No        | 0.86      | Yes       |
-| X  | Basic stack   | 9      | Add SimpleNet models to basic stack. High acc works best                          | -    | -    | -       | No        | 0.90      | Yes       |
+| X  | Basic stack   | 9      | Add SimpleNet models to basic stack. High acc (20) works best                     | -    | -    | -       | No        | 0.90      | Yes       |
+| X  | Basic stack   | 10     | Retrain all models with some of valid set, powers: pred=2, acc=20                 | -    | -    | -       | No        | 0.90      | Yes       |
+| X  | Basic stack   | 11     | Retrain all models with some of valid set, powers: pred=2, acc=18                 | -    | -    | -       | No        | 0.90      | Yes       |
 
 Basic stacking :
 - Altered data to give more weight to models with higher accuracy and confidence. Adjustable accuracy/probability weightings
