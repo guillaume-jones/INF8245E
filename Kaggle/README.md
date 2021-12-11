@@ -40,7 +40,7 @@ Notes:
 - Forgot to write specifics before VGG
 - Hypertuners can be reloaded for more info on accuracy and hyperparameters
 
-| #  | Architecture  | Save # | Specifics                                                                         | LR   | L2   | Dropout | Augmented | Best acc. | Submitted |
+| #  | Architecture  | Save | Specifics                                                                         | LR   | L2   | Dropout | Augmented | Best acc. | Submitted |
 |----|---------------|--------|-----------------------------------------------------------------------------------|------|------|---------|-----------|-----------|-----------|
 | 2  | AlexNet       |        | Extreme overfitting                                                               |      |      |         | No        | ~0.4      | No        |
 | 3  | GoogLeNet     | 1      |                                                                                   |      |      |         | No        | 0.66      | Yes       |
@@ -82,13 +82,20 @@ Notes:
 | 10 | WideResNet    | 5      | Fine tune best model from HT2 with non-augmented data                             | 1E-5 | 1E-4 | 0.4     | No        | 0.84      | No        |
 | 10 | WideResNet    | 6      | Try n=2, k=12, SpatialDropout2D and higher L2                                     | 5E-4 | 2E-4 | 0.5     | Yes       | 0.71      | No        |
 | 10 | WideResNet    | HT3    | Deeper with n=3 and k=12. Tried different L2/dropout. Underfit and overfit        | 1E-4 | -    | -       | Yes       | 0.79      | No        |
-| 10 | WideResNet    | HT3    | Deeper with n=3 and k=12. Tried different L2/dropout. Underfit and overfit        | 1E-4 | -    | -       | Yes       | 0.79      | No        |
 | 10 | WideResNet    | 8      | Fine tuned best model from HT3 (l2=0.001, drop=0.5)                               | 1E-5 | 1E-3 | 0.5     | No        | 0.84      | No        |
 | 11 | Stacking      | HT     | Try different dropouts and L2 regs for stacking. Overfit (lost 1.5% on test data) | 5E-5 | -    | -       | No        | 0.86      | Yes       |
 | 11 | Stacking      | 0      | Try 2 Dense layers, 512 then 256.                                                 | 1E-5 | 1E-4 | 0.3     | No        | 0.86      | No        |
 | 11 | Stacking      | 1      | Add SimpleNets, 3x256 layers                                                      | 1E-4 | 1E-1 | 0       | No        | 0.89      | No        |
 | 11 | Stacking      | 2      | Add more SimpleNets                                                               | 1E-4 | 1E-1 | 0       | No        | 0.89      | Yes       |
-| 14 | SimpleNet     | HT     | 7 trials with various L2, dropout, lr. Best Lr = 5E-4,                            | -    | -    | 0       | No        | 0.89      | Yes       |
+| 14 | SimpleNet     | 1      | Base SimpleNet, lr=0.001, drop=0, l2_reg=1E-3                                     | -    | -    | 0       | Yes       | 0.82      | No        |
+| 14 | SimpleNet     | HT     | 7 trials with various L2, dropout, lr. Best Lr = 5E-4                             | -    | -    | 0       | Yes       | 0.83      | No        |
+| 14 | SimpleNet     | 2      | Save best HT model, lr=5E-4, drop=0.1, l2_reg=5E-4                                | 5E-4 | 5E-4 | 0.1     | Yes       | 0.83      | No        |
+| 14 | SimpleNet     | 3      | Save 2nd best HT model, lr=2E-4, drop=0.1, l2_reg=1E-3                            | 2E-4 | 1E-3 | 0.1     | Yes       | 0.82      | No        |
+| 14 | SimpleNet     | 4-6    | Fine-tune models 1-3 with 4 epochs of 1E-5                                        | -    | -    | 0       | No        | 0.87      | No        |
+| 14 | SimpleNet     | 7      | Try increasing dense_dropout to 0.2                                               | 5E-4 | 5E-4 | 0.1     | Yes       | 0.82      | No        |
+| 14 | SimpleNet     | 8      | Fine-tune model 7 with 4 epochs of 1E-5                                           | -    | -    | 0       | No        | 0.89      | No        |
+| 14 | SimpleNet     | 9      | Try removing 1 layer                                                              | 5E-4 | -    | 0.05    | Yes       | 0.81      | No        |
+| 14 | SimpleNet     | 10     | Fine-tune model 9 with 4 epochs of 1E-5                                           | -    | -    | 0       | No        | 0.88      | No        |
 | X  | Basic stack   | 1      | Stacked best VGG, 2 good DeeperVGGs and VGG Res. Overfit to valid set by 1%       | -    | -    | -       | No        | 0.85      | Yes       |
 | X  | Basic stack   | 2      | Added DeeperVGG2_2                                                                | -    | -    | -       | No        | 0.86      | Yes       |
 | X  | Basic stack   | 3      | Try stacking DVGG_7 and DVGG2_3 (train + valid). Improved performance 0.5%        | -    | -    | -       | No        | 0.87      | Yes       |
@@ -138,6 +145,9 @@ Wide ResNet
 - [Detail of paper](https://modelzoo.co/model/wide-residual-networks)
 - [PyTorch implementation, consider trying in Keras](https://brandonmorris.dev/2018/06/30/wide-resnet-pytorch/)
 - [Keras implementation](https://github.com/keras-team/keras-contrib/blob/master/keras_contrib/applications/wide_resnet.py), different Batch-Relu-Conv order and missing ReLU for 1x1 conv blocks of shortcuts
+ 
+SimpleNet
+- [Original paper](https://arxiv.org/pdf/1608.06037v7.pdf)
  
 Vision Transformer
 - Transformers apparently need a lot of data (consider strong data augmentation)
