@@ -42,7 +42,6 @@ def load_train_set():
     # Add extra dimension to images for "channels"
     x_train = np.reshape(x_train, (-1, 96, 96, 1))
     
-
     # Open y_train and convert to numbers
     y_train_raw = open_pickled_file('data/y_train.pkl')
 
@@ -68,8 +67,7 @@ def load_train_as_dataset(return_complete_set=False):
     """
     x_complete, y_complete, x_train, y_train, x_valid, y_valid = load_train_set()
     
-    train_dataset = tf.data.Dataset.from_tensor_slices(
-        (x_train, y_train)).batch(32).prefetch(buffer_size=tf.data.AUTOTUNE)
+    train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
     valid_dataset = tf.data.Dataset.from_tensor_slices(
         (x_valid, y_valid)).batch(128).prefetch(buffer_size=tf.data.AUTOTUNE)
 
@@ -81,31 +79,26 @@ def load_train_as_dataset(return_complete_set=False):
     return train_dataset, valid_dataset, y_valid
 
 
-def augment_dataset(dataset, autoencoder=False):
+def augment_dataset(dataset, batch_size=32):
     """
     Augment images from training set with standard augmentations
     Also repeat and shuffle data for good training
     """
-    epoch_length = math.ceil(len(dataset) / 32)
-    dataset = dataset.shuffle(len(dataset))
+    epoch_length = math.ceil(len(dataset) / batch_size)
 
+    dataset = dataset.shuffle(len(dataset))
+    dataset = dataset.batch(batch_size)
     dataset = dataset.repeat()
 
     augmentation = tf.keras.Sequential()
     augmentation.add(layers.RandomFlip(mode='horizontal'))
     augmentation.add(layers.RandomRotation(0.07))
     augmentation.add(layers.RandomTranslation((-0.3, 0.3), (-0.3, 0.3)))
-    # augmentation.add(layers.RandomZoom(.05, .05)) # Breaks certain models completely (0 learning)
     augmentation.add(layers.RandomContrast(0.7))
 
     dataset = dataset.map(
         lambda image, y: (augmentation(image, training=True), y),
         num_parallel_calls=tf.data.AUTOTUNE)
-
-    if autoencoder:
-        dataset = dataset.map(
-            lambda image, _: (image, image),
-            num_parallel_calls=tf.data.AUTOTUNE)
 
     return dataset.prefetch(buffer_size=tf.data.AUTOTUNE), epoch_length
 
@@ -179,27 +172,6 @@ def plot_confusion_matrix(y_true, y_pred):
     )
     confusion_matrix_display.figure_.set_size_inches(10, 10)
     plt.show()
-
-class CycleScheduler:
-    def __init__(self, peak_lr, mid_epoch):
-        self.peak_lr = peak_lr
-        self.mid_epoch = mid_epoch
-    
-    def scheduler(self, epoch, lr):
-        # Initial ramp-up
-        if epoch <= self.mid_epoch:
-            return epoch * (self.peak_lr*0.8 / self.mid_epoch) + self.peak_lr * 0.2
-        # Terminal low learning rate
-        elif epoch > self.mid_epoch * 2:
-            return self.peak_lr * 0.2
-        # Ramp-down
-        else:
-
-            return epoch * -(self.peak_lr*0.8 / self.mid_epoch) + self.peak_lr * 1.8
-    
-    def callback(self):
-        return self.scheduler
-
 
 def train_model(
     model, dataset, valid_dataset, epochs, epoch_length=None, 
@@ -348,8 +320,6 @@ def hypertune_model(
 
     return tuner
 
-    
-
 def save_test_pred(filename, array):
     """
     Saves tests for kaggle submission
@@ -376,13 +346,3 @@ def generate_test_pred_filepath(model_filepath, x_test=None):
         return
 
     generate_test_pred(model, f'{model_filepath}_test_pred.csv', x_test)
-
-def is_tf_using_gpus():
-    """
-    Check that TensorFlow is using a GPU
-    """
-    gpus = len(tf.config.list_physical_devices('GPU'))
-    if gpus > 0:
-        print(f'TensorFlow is using a GPU. Number of GPUs available: {gpus}')
-    else:
-        print(f'TensorFlow is not using any GPUs.')
